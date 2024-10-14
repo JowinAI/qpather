@@ -1,51 +1,57 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-const QuestionGrid = ({ questions, handleBackClick }) => {
-  // Sample list of users to assign questions to
-  const [assignments, setAssignments] = useState(
-    questions.map(() => ({ assignedTo: "" }))
-  );
+const QuestionGrid = ({ questionsList, setQuestionsList }) => {
+  const users = ["User 1", "User 2", "User 3"];
 
-  // Handler to update the assigned user for a specific question
-  const handleAssignmentChange = (index, assignedTo) => {
-    const updatedAssignments = [...assignments];
-    updatedAssignments[index].assignedTo = assignedTo;
-    setAssignments(updatedAssignments);
+  const handleAssignToChange = (index, value) => {
+    const updatedQuestions = [...questionsList];
+    updatedQuestions[index].assignedTo = value;
+    setQuestionsList(updatedQuestions);
   };
 
   return (
-    <div className="question-grid-container">
-      <h3>Suggested Questions</h3>
-      <table className="question-grid">
-        <thead>
-          <tr>
-            <th>Question</th>
-            <th>Assign To</th>
-          </tr>
-        </thead>
-        <tbody>
-          {questions.map((question, index) => (
-            <tr key={index}>
-              <td>{question}</td>
-              <td>
-                <select
-                  value={assignments[index].assignedTo}
-                  onChange={(e) => handleAssignmentChange(index, e.target.value)}
-                >
-                  <option value="">Select User</option>
-                  <option value="User 1">User 1</option>
-                  <option value="User 2">User 2</option>
-                  <option value="User 3">User 3</option>
-                </select>
-              </td>
+    questionsList.length > 0 && (
+      <div className="questions-grid">
+        <h3>Suggested Questions</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Question</th>
+              <th>Assign To</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <button className="back-btn" onClick={handleBackClick}>
-        Back
-      </button>
-    </div>
+          </thead>
+          <tbody>
+            {questionsList.map((question, index) => (
+              <tr key={index}>
+                <td>
+                  <input
+                    type="text"
+                    value={question}
+                    onChange={(e) => {
+                      const updatedQuestions = [...questionsList];
+                      updatedQuestions[index] = e.target.value;
+                      setQuestionsList(updatedQuestions);
+                    }}
+                  />
+                </td>
+                <td>
+                  <select
+                    onChange={(e) => handleAssignToChange(index, e.target.value)}
+                  >
+                    <option value="">Select User</option>
+                    {users.map((user, i) => (
+                      <option key={i} value={user}>
+                        {user}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
   );
 };
 
