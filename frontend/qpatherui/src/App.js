@@ -74,7 +74,7 @@ function App() {
           {!showQuestionForm && !selectedRequest && (
             <>
               <button className="new-question-btn" onClick={handleNewQuestionClick}>
-                Start New Question
+                New Goal
               </button>
 
               {/* Open Requests Section */}
