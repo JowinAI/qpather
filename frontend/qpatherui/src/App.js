@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography, Container, List, ListItem, ListItemText, Box, CssBaseline } from '@mui/material';
+import { styled, ThemeProvider, createTheme } from '@mui/material/styles';
 import './App.css';
 import Sidebar from './Sidebar';
 import TeamManagement from './TeamManagement';
@@ -7,6 +9,30 @@ import UserSettings from './UserSettings'; // Import UserSettings component
 import QuestionForm from './QuestionForm';
 import QuestionGrid from './QuestionGrid';
 import OrgChartPage from './OrgChart'; // Import OrgChart component
+
+const drawerWidth = 240;
+
+const Root = styled('div')(({ theme }) => ({
+  display: 'flex',
+}));
+
+const Drawer = styled('div')(({ theme }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+}));
+
+const DrawerPaper = styled('div')(({ theme }) => ({
+  width: drawerWidth,
+}));
+
+const Content = styled('main')(({ theme }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  marginLeft: drawerWidth,
+}));
+
+const Toolbar = styled('div')(({ theme }) => theme.mixins.toolbar);
+const theme = createTheme();
 
 function App() {
   const [view, setView] = useState("home"); // Tracks the current view
@@ -69,124 +95,112 @@ function App() {
   const renderMainContent = () => {
     if (view === "home") {
       return (
-        <div className="left-content">
-          {/* Show the Start New Question button if form is not visible */}
+        <Container>
           {!showQuestionForm && !selectedRequest && (
             <>
-              <button className="new-question-btn" onClick={handleNewQuestionClick}>
+              <Button variant="contained" color="primary" onClick={handleNewQuestionClick}>
                 New Goal
-              </button>
-
-              {/* Open Requests Section */}
-              <div className="open-requests">
-                <h3>Open Requests</h3>
-                <ul>
-                  {openRequests.map((request, index) => (
-                    <li key={index} onClick={() => handleRequestClick(request)}>
-                      {request}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              </Button>
+              <Typography variant="h6">Open Requests</Typography>
+              <List>
+                {openRequests.map((request, index) => (
+                  <ListItem button key={index} onClick={() => handleRequestClick(request)}>
+                    <ListItemText primary={request} />
+                  </ListItem>
+                ))}
+              </List>
             </>
           )}
 
-          {/* Show Question Form if "Start New Question" button was clicked */}
           {showQuestionForm && !selectedRequest && (
             <>
               <QuestionForm setQuestionsList={setQuestionsList} setShowQuestionForm={setShowQuestionForm} />
-
-              {/* Display the question grid if there are questions returned from ChatGPT API */}
               {questionsList.length > 0 && (
                 <QuestionGrid questionsList={questionsList} setQuestionsList={setQuestionsList} />
               )}
             </>
           )}
 
-          {/* Show questions if a request is selected */}
           {selectedRequest && (
             <>
-              <h3>{selectedRequest}</h3>
-              <ul>
+              <Typography variant="h6">{selectedRequest}</Typography>
+              <List>
                 {["Question 1", "Question 2", "Question 3"].map((question, index) => (
-                  <li key={index}>
-                    <p>{question}</p>
-                    <input
-                      type="text"
-                      placeholder="Enter your answer"
+                  <ListItem key={index}>
+                    <ListItemText primary={question} />
+                    <TextField
+                      label="Enter your answer"
                       value={questionAnswers[index] || ""}
                       onChange={(e) => handleAnswerChange(index, e.target.value)}
                     />
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={forwardedQuestions.includes(index)}
-                        onChange={() => handleForwardChange(index)}
-                      />
-                      Forward
-                    </label>
-                  </li>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={forwardedQuestions.includes(index)}
+                          onChange={() => handleForwardChange(index)}
+                        />
+                      }
+                      label="Forward"
+                    />
+                  </ListItem>
                 ))}
-              </ul>
-
-              {/* Dropdown to assign to a user */}
-              <div>
-                <label>
-                  Assign to:
-                  <select
-                    value={assignedUser}
-                    onChange={(e) => setAssignedUser(e.target.value)}
-                    disabled={forwardedQuestions.length === 0} // Only enable if there are forwarded questions
-                  >
-                    <option value="">Select User</option>
-                    {teamMembers.map((user, index) => (
-                      <option key={index} value={user}>
-                        {user}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              {/* Save button */}
-              <button onClick={handleSave}>Save</button>
+              </List>
+              <FormControl fullWidth>
+                <InputLabel>Assign to</InputLabel>
+                <Select
+                  value={assignedUser}
+                  onChange={(e) => setAssignedUser(e.target.value)}
+                  disabled={forwardedQuestions.length === 0}
+                >
+                  <MenuItem value="">
+                    <em>Select User</em>
+                  </MenuItem>
+                  {teamMembers.map((user, index) => (
+                    <MenuItem key={index} value={user}>
+                      {user}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Button variant="contained" color="primary" onClick={handleSave}>
+                Save
+              </Button>
             </>
           )}
-        </div>
+        </Container>
       );
     }
 
-    // Render Team Management view
     if (view === "team") {
-      return <TeamManagement teamMembers={teamMembers} setTeamMembers={() => {}} setView={setView} />;
+      return <TeamManagement teamMembers={teamMembers} setTeamMembers={() => { }} setView={setView} />;
     }
 
-    // Render Org Settings view
     if (view === "orgSettings") {
       return <OrgSettings />;
     }
 
-    // Render User Settings view
     if (view === "userSettings") {
       return <UserSettings />;
     }
 
-    // Render Org Chart view
     if (view === "orgChart") {
-      return <OrgChartPage />;  // Render the Org Chart component
+      return <OrgChartPage />;
     }
 
-    return null; // Fallback in case no view matches
+    return null;
   };
 
   return (
-    <div className="app-container">
-      {/* Sidebar for navigation */}
-      <Sidebar setView={setView} />
-
-      {/* Main content area based on selected view */}
-      <div className="main-content">{renderMainContent()}</div>
-    </div>
+    <Root>
+      <CssBaseline />
+      <Drawer>
+        <Sidebar setView={setView} />
+      </Drawer>
+      <Content>
+        <Toolbar />
+        {renderMainContent()}
+      </Content>
+    </Root>
   );
 }
 
