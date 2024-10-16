@@ -29,20 +29,16 @@ jobs:
       - name: Install dependencies
         working-directory: ./backend
         run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
         working-directory: ./backend
-        run: zip release.zip ./* -r
+        run: zip -r ../release.zip ./*
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: |
-            ./backend/release.zip
-            !venv/
+          path: ../release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -60,7 +56,7 @@ jobs:
           name: python-app
 
       - name: Unzip artifact for deployment
-        run: unzip backend/release.zip
+        run: unzip release.zip
 
       - name: 'Login via Azure Publish Profile'
         uses: azure/login@v2
@@ -73,4 +69,4 @@ jobs:
         with:
           app-name: 'qpather-qa-api'
           slot-name: 'production' # Optional if you have deployment slots
-          package: './backend/release.zip' # Path to the zipped artifact from the backend folder
+          package: './release.zip' # Path to the zipped artifact in the root directory
