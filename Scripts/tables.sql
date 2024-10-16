@@ -1,4 +1,5 @@
-
+-- Drop existing tables if they exist
+--DROP TABLE IF EXISTS OrganizationFeatureAccess, Feature, AuditLog, Billing, OrganizationSubscription, SubscriptionPlan, UserSettings, OrganizationSettings, UserResponse, Assignment, Goal, [User], Department, Organization, Client;
 
 -- Client Table
 CREATE TABLE Client (
@@ -58,12 +59,12 @@ CREATE TABLE [User] (
     FOREIGN KEY (DepartmentId) REFERENCES Department(Id)
 );
 
--- Goal Table
+-- Goal Table (Updated with DueDate)
 CREATE TABLE Goal (
     Id INT PRIMARY KEY IDENTITY(1,1),
     OrganizationId INT NOT NULL,                 -- Foreign key to Organization
     Title NVARCHAR(255) NOT NULL,                -- Title of the goal
-    [Date] DATETIME NOT NULL,                    -- Date of the goal
+    DueDate DATETIME NOT NULL,                   -- Due date of the goal (previously Date column)
     InitiatedBy NVARCHAR(255),                   -- Email of the person who initiated the goal
     GoalDescription NVARCHAR(255),               -- Description of the goal
     CreatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
@@ -88,23 +89,13 @@ CREATE TABLE Assignment (
     FOREIGN KEY (ParentAssignmentId) REFERENCES Assignment(Id)
 );
 
--- AssignmentUser Table
-CREATE TABLE AssignmentUser (
+-- UserResponse Table (Merged from AssignmentUser and Response)
+CREATE TABLE UserResponse (
+    Id INT PRIMARY KEY IDENTITY(1,1),
     AssignmentId INT NOT NULL,                   -- Foreign key to Assignment
     AssignedTo NVARCHAR(255) NOT NULL,           -- Email of the user assigned to the assignment
-    CreatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
-    UpdatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
-    CreatedBy NVARCHAR(255),                     -- Audit column
-    UpdatedBy NVARCHAR(255) NULL,                -- Audit column
-    PRIMARY KEY (AssignmentId, AssignedTo),      -- Composite key to ensure uniqueness
-    FOREIGN KEY (AssignmentId) REFERENCES Assignment(Id)
-);
-
--- Response Table
-CREATE TABLE Response (
-    Id INT PRIMARY KEY IDENTITY(1,1),
-    AssignmentId INT NOT NULL,                   -- Foreign key linking to the Assignment
-    Answer NVARCHAR(MAX) NOT NULL,               -- The response or answer to the question
+    Answer NVARCHAR(MAX),                        -- The response or answer to the question
+    Status NVARCHAR(50) DEFAULT 'Assigned',      -- Status of the assignment ('Assigned', 'Draft', 'Final')
     CreatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
     UpdatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
     CreatedBy NVARCHAR(255),                     -- Audit column
@@ -114,7 +105,8 @@ CREATE TABLE Response (
 
 -- OrganizationSettings Table
 CREATE TABLE OrganizationSettings (
-    OrganizationId INT PRIMARY KEY,              -- Foreign key linking to Organization
+    Id INT PRIMARY KEY IDENTITY(1,1),            -- Unique identifier
+    OrganizationId INT NOT NULL,                 -- Foreign key linking to Organization
     BusinessSector NVARCHAR(100),                -- Business sector (e.g., Technology, Finance)
     CompanySize NVARCHAR(50),                    -- Company size (e.g., Small, Medium, Large)
     TeamStructure NVARCHAR(MAX),                 -- JSON or comma-separated list of team names
@@ -129,7 +121,8 @@ CREATE TABLE OrganizationSettings (
 
 -- UserSettings Table
 CREATE TABLE UserSettings (
-    UserId INT PRIMARY KEY,                      -- Foreign key linking to User
+    Id INT PRIMARY KEY IDENTITY(1,1),            -- Unique identifier
+    UserId INT NOT NULL,                         -- Foreign key linking to User
     Role NVARCHAR(255),                          -- Multi-select role of the user (e.g., CEO, Manager)
     BusinessObjective NVARCHAR(MAX),             -- Multi-select business objectives
     CurrentChallenges NVARCHAR(MAX),             -- Multi-select current challenges
@@ -161,8 +154,9 @@ CREATE TABLE SubscriptionPlan (
 
 -- OrganizationSubscription Table
 CREATE TABLE OrganizationSubscription (
-    OrganizationId INT,                          -- Foreign key linking to Organization
-    SubscriptionPlanId INT,                      -- Foreign key linking to SubscriptionPlan
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    OrganizationId INT NOT NULL,                 -- Foreign key linking to Organization
+    SubscriptionPlanId INT NOT NULL,             -- Foreign key linking to SubscriptionPlan
     StartDate DATE NOT NULL,                     -- Start date of the subscription
     EndDate DATE NOT NULL,                       -- End date of the subscription
     IsActive BIT DEFAULT 1,                      -- Whether the subscription is active or not
@@ -170,7 +164,6 @@ CREATE TABLE OrganizationSubscription (
     UpdatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
     CreatedBy NVARCHAR(255),                     -- Audit column
     UpdatedBy NVARCHAR(255) NULL,                -- Audit column
-    PRIMARY KEY (OrganizationId, SubscriptionPlanId), -- Composite primary key
     FOREIGN KEY (OrganizationId) REFERENCES Organization(Id),
     FOREIGN KEY (SubscriptionPlanId) REFERENCES SubscriptionPlan(Id)
 );
@@ -195,26 +188,33 @@ CREATE TABLE Billing (
 CREATE TABLE Feature (
     Id INT PRIMARY KEY IDENTITY(1,1),
     FeatureName NVARCHAR(100) NOT NULL,          -- Name of the feature
-    Description NVARCHAR(MAX)                    -- Description of the feature
+    Description NVARCHAR(MAX),                   -- Description of the feature
+    CreatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
+    UpdatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
+    CreatedBy NVARCHAR(255),                     -- Audit column
+    UpdatedBy NVARCHAR(255) NULL                 -- Audit column
 );
 
 -- OrganizationFeatureAccess Table
 CREATE TABLE OrganizationFeatureAccess (
-    OrganizationId INT,                          -- Foreign key to Organization
-    FeatureId INT,                               -- Foreign key to Feature
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    OrganizationId INT NOT NULL,                 -- Foreign key to Organization
+    FeatureId INT NOT NULL,                      -- Foreign key to Feature
     AccessGranted BIT DEFAULT 1,                 -- Whether access is granted or not
-    PRIMARY KEY (OrganizationId, FeatureId),     -- Composite key to ensure uniqueness
+    CreatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
+    UpdatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
+    CreatedBy NVARCHAR(255),                     -- Audit column
+    UpdatedBy NVARCHAR(255) NULL,                -- Audit column
     FOREIGN KEY (OrganizationId) REFERENCES Organization(Id),
     FOREIGN KEY (FeatureId) REFERENCES Feature(Id)
 );
 
--- AuditLog Table
+-- AuditLog Table (Updated)
 CREATE TABLE AuditLog (
     Id INT PRIMARY KEY IDENTITY(1,1),
-    UserId INT,                                  -- Foreign key to User
+    UserId NVARCHAR(255),                        -- User email instead of foreign key
     OrganizationId INT,                          -- Foreign key to Organization
     Action NVARCHAR(255),                        -- Action performed (e.g., Created Assignment, Updated Goal)
     Timestamp DATETIME DEFAULT GETDATE(),        -- Timestamp for the action
-    FOREIGN KEY (UserId) REFERENCES [User](Id),
     FOREIGN KEY (OrganizationId) REFERENCES Organization(Id)
 );
