@@ -4,10 +4,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'frontend/qpatherui/**' 
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+    paths:
+      - 'frontend/qpatherui/**'
 
 jobs:
   build_and_deploy_job:
