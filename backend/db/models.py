@@ -106,7 +106,7 @@ class Assignment(Base):
 
 # UserResponse Table (Merged AssignmentUser and Response)
 class UserResponse(Base):
-    __tablename__ = 'user_response'
+    __tablename__ = 'userresponse'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     AssignmentId = Column(Integer, ForeignKey('assignment.Id'), nullable=False)
@@ -122,7 +122,7 @@ class UserResponse(Base):
 
 # OrganizationSettings Table
 class OrganizationSettings(Base):
-    __tablename__ = 'organization_settings'
+    __tablename__ = 'organizationsettings'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     OrganizationId = Column(Integer, ForeignKey('organization.Id'), nullable=False)
@@ -140,7 +140,7 @@ class OrganizationSettings(Base):
 
 # UserSettings Table
 class UserSettings(Base):
-    __tablename__ = 'user_settings'
+    __tablename__ = 'usersettings'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     UserId = Column(Integer, ForeignKey('user.Id'), nullable=False)
@@ -163,7 +163,7 @@ class UserSettings(Base):
 
 # SubscriptionPlan Table
 class SubscriptionPlan(Base):
-    __tablename__ = 'subscription_plan'
+    __tablename__ = 'subscriptionplan'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     PlanName = Column(String(100), nullable=False)
@@ -176,11 +176,11 @@ class SubscriptionPlan(Base):
 
 # OrganizationSubscription Table
 class OrganizationSubscription(Base):
-    __tablename__ = 'organization_subscription'
+    __tablename__ = 'organizationsubscription'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     OrganizationId = Column(Integer, ForeignKey('organization.Id'), nullable=False)
-    SubscriptionPlanId = Column(Integer, ForeignKey('subscription_plan.Id'), nullable=False)
+    SubscriptionPlanId = Column(Integer, ForeignKey('subscriptionplan.Id'), nullable=False)
     StartDate = Column(DateTime, nullable=False)
     EndDate = Column(DateTime, nullable=False)
     IsActive = Column(Boolean, default=True)
@@ -190,7 +190,7 @@ class OrganizationSubscription(Base):
     UpdatedBy = Column(String(255), nullable=True)
     
     organization = relationship("Organization")
-    subscription_plan = relationship("SubscriptionPlan")
+    subscriptionplan = relationship("SubscriptionPlan")
 
 # Billing Table
 class Billing(Base):
@@ -224,7 +224,7 @@ class Feature(Base):
 
 # OrganizationFeatureAccess Table
 class OrganizationFeatureAccess(Base):
-    __tablename__ = 'organization_feature_access'
+    __tablename__ = 'organizationfeatureaccess'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     OrganizationId = Column(Integer, ForeignKey('organization.Id'), nullable=False)
@@ -240,7 +240,7 @@ class OrganizationFeatureAccess(Base):
 
 # AuditLog Table
 class AuditLog(Base):
-    __tablename__ = 'audit_log'
+    __tablename__ = 'auditlog'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     UserId = Column(String(255))  # Now it's the user's email instead of a foreign key

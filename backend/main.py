@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 from db.models import Base
-from api.routes import test, client, organization, department, goal, assignment, assignment_user, response, organization_settings, user_settings, subscription_plan, organization_subscription, billing, feature, organization_feature_access, audit_log
+from api.routes import test, client, organization, department, goal, assignment,  response, organization_settings, user_settings, subscription_plan, organization_subscription, billing, feature, organization_feature_access, audit_log
 import uvicorn
 from db.database import engine
 from fastapi.middleware.cors import CORSMiddleware
@@ -52,7 +52,7 @@ app.include_router(organization.router, prefix="/api/v1", tags=["Organization"])
 app.include_router(department.router, prefix="/api/v1", tags=["Department"])
 app.include_router(goal.router, prefix="/api/v1", tags=["Goal"])
 app.include_router(assignment.router, prefix="/api/v1", tags=["Assignment"])
-app.include_router(assignment_user.router, prefix="/api/v1", tags=["AssignmentUser"])
+
 app.include_router(response.router, prefix="/api/v1", tags=["Response"])
 app.include_router(organization_settings.router, prefix="/api/v1", tags=["OrganizationSettings"])
 app.include_router(user_settings.router, prefix="/api/v1", tags=["UserSettings"])

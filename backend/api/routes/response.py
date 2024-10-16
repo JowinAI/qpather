@@ -6,54 +6,58 @@ from api.dependencies.model_utils import get_db
 
 router = APIRouter()
 
-# Create a new response
-@router.post("/responses/", response_model=schemas.Response)
-def create_response(response: schemas.ResponseCreate, db: Session = Depends(get_db)):
-    new_response = models.Response(
-        AssignmentId=response.AssignmentId,
-        Answer=response.Answer,
-        CreatedBy=response.CreatedBy
+# Create a new user response (merged structure)
+@router.post("/user-responses/", response_model=schemas.UserResponse)
+def create_user_response(user_response: schemas.UserResponseCreate, db: Session = Depends(get_db)):
+    new_user_response = models.UserResponse(
+        AssignmentId=user_response.AssignmentId,
+        AssignedTo=user_response.AssignedTo,
+        Answer=user_response.Answer,
+        Status=user_response.Status,  # 'Assigned', 'Draft', 'Final'
+        CreatedBy=user_response.CreatedBy
     )
-    db.add(new_response)
+    db.add(new_user_response)
     db.commit()
-    db.refresh(new_response)
-    return new_response
+    db.refresh(new_user_response)
+    return new_user_response
 
-# Get response by ID
-@router.get("/responses/{response_id}", response_model=schemas.Response)
-def get_response(response_id: int, db: Session = Depends(get_db)):
-    response = db.query(models.Response).filter(models.Response.Id == response_id).first()
-    if response is None:
-        raise HTTPException(status_code=404, detail="Response not found")
-    return response
+# Get user response by ID
+@router.get("/user-responses/{response_id}", response_model=schemas.UserResponse)
+def get_user_response(response_id: int, db: Session = Depends(get_db)):
+    user_response = db.query(models.UserResponse).filter(models.UserResponse.Id == response_id).first()
+    if user_response is None:
+        raise HTTPException(status_code=404, detail="User response not found")
+    return user_response
 
-# Get all responses
-@router.get("/responses/", response_model=List[schemas.Response])
-def get_responses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    responses = db.query(models.Response).order_by(models.Response.Id).offset(skip).limit(limit).all()
-    return responses
+# Get all user responses
+@router.get("/user-responses/", response_model=List[schemas.UserResponse])
+def get_user_responses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    user_responses = db.query(models.UserResponse).order_by(models.UserResponse.Id).offset(skip).limit(limit).all()
+    return user_responses
 
-# Update response by ID
-@router.put("/responses/{response_id}", response_model=schemas.Response)
-def update_response(response_id: int, response: schemas.ResponseUpdate, db: Session = Depends(get_db)):
-    db_response = db.query(models.Response).filter(models.Response.Id == response_id).first()
-    if db_response is None:
-        raise HTTPException(status_code=404, detail="Response not found")
+# Update user response by ID
+@router.put("/user-responses/{response_id}", response_model=schemas.UserResponse)
+def update_user_response(response_id: int, user_response: schemas.UserResponseUpdate, db: Session = Depends(get_db)):
+    db_user_response = db.query(models.UserResponse).filter(models.UserResponse.Id == response_id).first()
+    if db_user_response is None:
+        raise HTTPException(status_code=404, detail="User response not found")
     
-    db_response.AssignmentId = response.AssignmentId
-    db_response.Answer = response.Answer
-    db_response.UpdatedBy = response.UpdatedBy
+    db_user_response.AssignmentId = user_response.AssignmentId
+    db_user_response.AssignedTo = user_response.AssignedTo
+    db_user_response.Answer = user_response.Answer
+    db_user_response.Status = user_response.Status
+    db_user_response.UpdatedBy = user_response.UpdatedBy
     db.commit()
-    db.refresh(db_response)
-    return db_response
+    db.refresh(db_user_response)
+    return db_user_response
 
-# Delete response by ID
-@router.delete("/responses/{response_id}", response_model=schemas.Response)
-def delete_response(response_id: int, db: Session = Depends(get_db)):
-    db_response = db.query(models.Response).filter(models.Response.Id == response_id).first()
-    if db_response is None:
-        raise HTTPException(status_code=404, detail="Response not found")
+# Delete user response by ID
+@router.delete("/user-responses/{response_id}", response_model=schemas.UserResponse)
+def delete_user_response(response_id: int, db: Session = Depends(get_db)):
+    db_user_response = db.query(models.UserResponse).filter(models.UserResponse.Id == response_id).first()
+    if db_user_response is None:
+        raise HTTPException(status_code=404, detail="User response not found")
     
-    db.delete(db_response)
+    db.delete(db_user_response)
     db.commit()
-    return db_response
+    return db_user_response

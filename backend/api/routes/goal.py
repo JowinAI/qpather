@@ -12,7 +12,7 @@ def create_goal(goal: schemas.GoalCreate, db: Session = Depends(get_db)):
     new_goal = models.Goal(
         OrganizationId=goal.OrganizationId,
         Title=goal.Title,
-        Date=goal.Date,
+        DueDate=goal.DueDate,  # Changed from Date to DueDate
         InitiatedBy=goal.InitiatedBy,
         GoalDescription=goal.GoalDescription,
         CreatedBy=goal.CreatedBy
@@ -45,7 +45,7 @@ def update_goal(goal_id: int, goal: schemas.GoalUpdate, db: Session = Depends(ge
     
     db_goal.OrganizationId = goal.OrganizationId
     db_goal.Title = goal.Title
-    db_goal.Date = goal.Date
+    db_goal.DueDate = goal.DueDate  # Changed from Date to DueDate
     db_goal.InitiatedBy = goal.InitiatedBy
     db_goal.GoalDescription = goal.GoalDescription
     db_goal.UpdatedBy = goal.UpdatedBy
