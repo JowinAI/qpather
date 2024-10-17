@@ -37,7 +37,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 # Get all users
 @router.get("/users/", response_model=list[schemas.User])
 def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = db.query(models.User).offset(skip).limit(limit).all()
+    users = db.query(models.User).order_by(models.User.Id).offset(skip).limit(limit).all()
     return users
 
 # Update user by ID
