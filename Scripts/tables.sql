@@ -63,7 +63,7 @@ CREATE TABLE Goal (
     Id INT PRIMARY KEY IDENTITY(1,1),
     OrganizationId INT NOT NULL,                 -- Foreign key to Organization
     Title NVARCHAR(255) NOT NULL,                -- Title of the goal
-    [Date] DATETIME NOT NULL,                    -- Date of the goal
+    [DueDate] DATETIME NULL,                    -- Date of the goal
     InitiatedBy NVARCHAR(255),                   -- Email of the person who initiated the goal
     GoalDescription NVARCHAR(255),               -- Description of the goal
     CreatedAt DATETIME DEFAULT GETDATE(),        -- Audit column
