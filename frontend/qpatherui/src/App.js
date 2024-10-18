@@ -108,7 +108,7 @@ function App() {
               <Typography variant="h6">Open Requests</Typography>
               <List>
                 {openRequests.map((request, index) => (
-                  <ListItem button key={index} onClick={() => handleRequestClick(request)}>
+                  <ListItem button="true" key={index} onClick={() => handleRequestClick(request)}>
                     <ListItemText primary={request} />
                   </ListItem>
                 ))}
