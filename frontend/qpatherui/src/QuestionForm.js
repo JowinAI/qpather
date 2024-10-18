@@ -9,13 +9,35 @@ const QuestionForm = ({ setQuestionsList, setShowQuestionForm }) => {
   const instruction = "Please respond with a JSON array of questions to ask others about this content. Limit 5 answers.";
 
   const handleAnalyzeClick = async () => {
+    alert('hi1');
     if (newQuestion.trim()) {
       setLoading(true);
       const questions = await getChatGPTResponse(context, newQuestion, instruction);
+      
+      // Common goal for all questions
+      const commonGoal = "Answer the questions to help forecast sales trends.";
+
+      const questionsListNew = questions.map((question, index) => {
+        return {
+          questionText: question,
+          Order: index + 1, // Dynamic index, starting from 1
+          AssignedUsers: "" // Empty string for AssignedUsers
+        };
+      });
+  
+      // Create the final object that contains the Goal and questions list
+      const finalPayload = {
+        Goal: commonGoal,
+        Questions: questionsListNew,
+        GoalDescription: commonGoal
+      };
+  
       setLoading(false);
+      
+      // Only set questionsList if there are questions
       if (questions.length > 0) {
-        setQuestionsList(questions);
-        // Keep the form visible, do not hide it after analysis
+        setQuestionsList(finalPayload);
+        
       } else {
         alert("No questions received. Please try again.");
       }

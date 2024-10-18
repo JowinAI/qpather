@@ -131,9 +131,36 @@ class AssignmentBase(BaseModel):
     ParentAssignmentId: Optional[int] = None
     QuestionText: str
     Order: Optional[int] = None
+    CreatedAt: datetime
+    UpdatedAt: Optional[datetime] = None
+    CreatedBy: str
+    UpdatedBy: Optional[str] = None
 
 class AssignmentCreate(AssignmentBase):
     pass
+
+    
+class AssignmentWithUsers(BaseModel):
+    Id: Optional[int] = None
+    GoalId: Optional[int] = None
+    Goal:Optional[str] = None
+    ParentAssignmentId: Optional[int] = None
+    QuestionText: str
+    Order: Optional[int] = None
+    CreatedAt: datetime = datetime.utcnow()  # Default value
+    UpdatedAt: Optional[datetime] = None
+    CreatedBy: str
+    UpdatedBy: Optional[str] = None
+    AssignedUsers: List[str]  = None# List of assigned users
+   
+class AssignmentsFirstSave(BaseModel):
+    Assignments:List[AssignmentWithUsers] 
+    Goal:str
+    GoalDescription:Optional[str] = None
+    OrganizationId:Optional[int] =None
+    DueDate:Optional[datetime]=None
+    InitiatedBy:Optional[str]=None  
+
 
 class AssignmentUpdate(AssignmentBase):
     UpdatedBy: Optional[str] = None

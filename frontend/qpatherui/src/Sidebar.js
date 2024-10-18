@@ -15,31 +15,31 @@ const Sidebar = ({ setView }) => {
         </Typography>
       </Toolbar>
       <List>
-        <ListItem button onClick={() => setView('home')}>
+        <ListItem button="true"  onClick={() => setView('home')}>
           <ListItemIcon>
             <HomeIcon />
           </ListItemIcon>
           <ListItemText primary="Home" />
         </ListItem>
-        <ListItem button onClick={() => setView('team')}>
+        <ListItem button="true"  onClick={() => setView('team')}>
           <ListItemIcon>
             <GroupIcon />
           </ListItemIcon>
           <ListItemText primary="Team Management" />
         </ListItem>
-        <ListItem button onClick={() => setView('orgSettings')}>
+        <ListItem button="true"  onClick={() => setView('orgSettings')}>
           <ListItemIcon>
             <SettingsIcon />
           </ListItemIcon>
           <ListItemText primary="Org Settings" />
         </ListItem>
-        <ListItem button onClick={() => setView('userSettings')}>
+        <ListItem button="true"  onClick={() => setView('userSettings')}>
           <ListItemIcon>
             <AccountCircleIcon />
           </ListItemIcon>
           <ListItemText primary="User Settings" />
         </ListItem>
-        <ListItem button onClick={() => setView('orgChart')}>
+        <ListItem button="true"  onClick={() => setView('orgChart')}>
           <ListItemIcon>
             <OrgChartIcon />
           </ListItemIcon>

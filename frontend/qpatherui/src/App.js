@@ -43,7 +43,11 @@ function App() {
   const [openRequests] = useState(["Request 1", "Request 2", "Request 3"]); // Static open requests
   const [teamMembers] = useState(["User 1", "User 2", "User 3"]); // List of team members for assignment
   const [showQuestionForm, setShowQuestionForm] = useState(false); // Controls visibility of the question form
-  const [questionsList, setQuestionsList] = useState([]); // Stores questions for new question flow
+  const [questionsList, setQuestionsList] = useState({
+    Goal: null,  // Default Goal to null, can be updated later
+    Questions: [] , // Empty array for Questions
+    GoalDescription:null
+  });
 
   // Handle selecting an open request
   const handleRequestClick = (request) => {
@@ -115,7 +119,7 @@ function App() {
           {showQuestionForm && !selectedRequest && (
             <>
               <QuestionForm setQuestionsList={setQuestionsList} setShowQuestionForm={setShowQuestionForm} />
-              {questionsList.length > 0 && (
+              {questionsList.Questions.length > 0 && (
                 <QuestionGrid questionsList={questionsList} setQuestionsList={setQuestionsList} />
               )}
             </>
