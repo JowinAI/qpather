@@ -9,7 +9,7 @@ const QuestionForm = ({ setQuestionsList, setShowQuestionForm }) => {
   const instruction = "Please respond with a JSON array of questions to ask others about this content. Limit 5 answers.";
 
   const handleAnalyzeClick = async () => {
-    alert('hi1');
+   
     if (newQuestion.trim()) {
       setLoading(true);
       const questions = await getChatGPTResponse(context, newQuestion, instruction);
