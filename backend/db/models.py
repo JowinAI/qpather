@@ -70,14 +70,14 @@ class User(Base):
     organization = relationship("Organization")
     department = relationship("Department")
 
-# Goal Table
+# Goal Table (with DueDate)
 class Goal(Base):
     __tablename__ = 'goal'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     OrganizationId = Column(Integer, ForeignKey('organization.Id'), nullable=False)
     Title = Column(String(255), nullable=False)
-    Date = Column(DateTime, nullable=False)
+    DueDate = Column(DateTime, nullable=False)  # Renamed from Date to DueDate
     InitiatedBy = Column(String(255))
     GoalDescription = Column(String(255))
     CreatedAt = Column(DateTime, default=func.now())
@@ -104,26 +104,15 @@ class Assignment(Base):
     goal = relationship("Goal")
     parent_assignment = relationship("Assignment", remote_side=[Id])
 
-# AssignmentUser Table
-class AssignmentUser(Base):
-    __tablename__ = 'assignment_user'
-    
-    AssignmentId = Column(Integer, ForeignKey('assignment.Id'), primary_key=True)
-    AssignedTo = Column(String(255), primary_key=True)  # Composite primary key
-    CreatedAt = Column(DateTime, default=func.now())
-    UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
-    CreatedBy = Column(String(255))
-    UpdatedBy = Column(String(255), nullable=True)
-    
-    assignment = relationship("Assignment")
-
-# Response Table
-class Response(Base):
-    __tablename__ = 'response'
+# UserResponse Table (Merged AssignmentUser and Response)
+class UserResponse(Base):
+    __tablename__ = 'userresponse'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     AssignmentId = Column(Integer, ForeignKey('assignment.Id'), nullable=False)
-    Answer = Column(Text, nullable=False)
+    AssignedTo = Column(String(255), nullable=False)
+    Answer = Column(Text)
+    Status = Column(String(50), default='Assigned')  # 'Assigned', 'Draft', 'Final'
     CreatedAt = Column(DateTime, default=func.now())
     UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
     CreatedBy = Column(String(255))
@@ -133,9 +122,10 @@ class Response(Base):
 
 # OrganizationSettings Table
 class OrganizationSettings(Base):
-    __tablename__ = 'organization_settings'
+    __tablename__ = 'organizationsettings'
     
-    OrganizationId = Column(Integer, ForeignKey('organization.Id'), primary_key=True)
+    Id = Column(Integer, primary_key=True, autoincrement=True)
+    OrganizationId = Column(Integer, ForeignKey('organization.Id'), nullable=False)
     BusinessSector = Column(String(100))
     CompanySize = Column(String(50))
     TeamStructure = Column(Text)
@@ -150,9 +140,10 @@ class OrganizationSettings(Base):
 
 # UserSettings Table
 class UserSettings(Base):
-    __tablename__ = 'user_settings'
+    __tablename__ = 'usersettings'
     
-    UserId = Column(Integer, ForeignKey('user.Id'), primary_key=True)
+    Id = Column(Integer, primary_key=True, autoincrement=True)
+    UserId = Column(Integer, ForeignKey('user.Id'), nullable=False)
     Role = Column(String(255))
     BusinessObjective = Column(Text)
     CurrentChallenges = Column(Text)
@@ -172,7 +163,7 @@ class UserSettings(Base):
 
 # SubscriptionPlan Table
 class SubscriptionPlan(Base):
-    __tablename__ = 'subscription_plan'
+    __tablename__ = 'subscriptionplan'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     PlanName = Column(String(100), nullable=False)
@@ -185,10 +176,11 @@ class SubscriptionPlan(Base):
 
 # OrganizationSubscription Table
 class OrganizationSubscription(Base):
-    __tablename__ = 'organization_subscription'
+    __tablename__ = 'organizationsubscription'
     
-    OrganizationId = Column(Integer, ForeignKey('organization.Id'), primary_key=True)
-    SubscriptionPlanId = Column(Integer, ForeignKey('subscription_plan.Id'), primary_key=True)
+    Id = Column(Integer, primary_key=True, autoincrement=True)
+    OrganizationId = Column(Integer, ForeignKey('organization.Id'), nullable=False)
+    SubscriptionPlanId = Column(Integer, ForeignKey('subscriptionplan.Id'), nullable=False)
     StartDate = Column(DateTime, nullable=False)
     EndDate = Column(DateTime, nullable=False)
     IsActive = Column(Boolean, default=True)
@@ -198,7 +190,7 @@ class OrganizationSubscription(Base):
     UpdatedBy = Column(String(255), nullable=True)
     
     organization = relationship("Organization")
-    subscription_plan = relationship("SubscriptionPlan")
+    subscriptionplan = relationship("SubscriptionPlan")
 
 # Billing Table
 class Billing(Base):
@@ -225,27 +217,35 @@ class Feature(Base):
     Id = Column(Integer, primary_key=True, autoincrement=True)
     FeatureName = Column(String(100), nullable=False)
     Description = Column(Text)
+    CreatedAt = Column(DateTime, default=func.now())
+    UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
+    CreatedBy = Column(String(255))
+    UpdatedBy = Column(String(255), nullable=True)
 
 # OrganizationFeatureAccess Table
 class OrganizationFeatureAccess(Base):
-    __tablename__ = 'organization_feature_access'
+    __tablename__ = 'organizationfeatureaccess'
     
-    OrganizationId = Column(Integer, ForeignKey('organization.Id'), primary_key=True)
-    FeatureId = Column(Integer, ForeignKey('feature.Id'), primary_key=True)
+    Id = Column(Integer, primary_key=True, autoincrement=True)
+    OrganizationId = Column(Integer, ForeignKey('organization.Id'), nullable=False)
+    FeatureId = Column(Integer, ForeignKey('feature.Id'), nullable=False)
     AccessGranted = Column(Boolean, default=True)
+    CreatedAt = Column(DateTime, default=func.now())
+    UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
+    CreatedBy = Column(String(255))
+    UpdatedBy = Column(String(255), nullable=True)
     
     organization = relationship("Organization")
     feature = relationship("Feature")
 
 # AuditLog Table
 class AuditLog(Base):
-    __tablename__ = 'audit_log'
+    __tablename__ = 'auditlog'
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
-    UserId = Column(Integer, ForeignKey('user.Id'))
+    UserId = Column(String(255))  # Now it's the user's email instead of a foreign key
     OrganizationId = Column(Integer, ForeignKey('organization.Id'))
     Action = Column(String(255))
     Timestamp = Column(DateTime, default=func.now())
     
-    user = relationship("User")
     organization = relationship("Organization")

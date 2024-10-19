@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getChatGPTResponse } from './ChatGPTApi';
+import { getChatGPTResponse , getChatGPTResponse2} from './ChatGPTApi';
 
 const QuestionForm = ({ setQuestionsList, setShowQuestionForm }) => {
   const [newQuestion, setNewQuestion] = useState("");
@@ -9,13 +9,35 @@ const QuestionForm = ({ setQuestionsList, setShowQuestionForm }) => {
   const instruction = "Please respond with a JSON array of questions to ask others about this content. Limit 5 answers.";
 
   const handleAnalyzeClick = async () => {
+   
     if (newQuestion.trim()) {
       setLoading(true);
       const questions = await getChatGPTResponse(context, newQuestion, instruction);
+      const questionsDetail = await getChatGPTResponse2( newQuestion);
+      // Common goal for all questions
+      const commonGoal = questionsDetail.Goal;
+
+      const questionsListNew = questionsDetail.Questions.map((question, index) => {
+        return {
+          questionText: question,
+          Order: index + 1, // Dynamic index, starting from 1
+          AssignedUsers: "" // Empty string for AssignedUsers
+        };
+      });
+  
+      // Create the final object that contains the Goal and questions list
+      const finalPayload = {
+        Goal: commonGoal,
+        Questions: questionsListNew,
+        GoalDescription: commonGoal
+      };
+  
       setLoading(false);
+      
+      // Only set questionsList if there are questions
       if (questions.length > 0) {
-        setQuestionsList(questions);
-        // Keep the form visible, do not hide it after analysis
+        setQuestionsList(finalPayload);
+        
       } else {
         alert("No questions received. Please try again.");
       }

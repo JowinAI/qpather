@@ -100,11 +100,11 @@ class User(UserBase):
         orm_mode = True
 
 
-# Goal Schema
+# Goal Schema (DueDate instead of Date)
 class GoalBase(BaseModel):
     OrganizationId: int
     Title: str
-    Date: datetime
+    DueDate: datetime
     InitiatedBy: Optional[str] = None
     GoalDescription: Optional[str] = None
 
@@ -131,9 +131,36 @@ class AssignmentBase(BaseModel):
     ParentAssignmentId: Optional[int] = None
     QuestionText: str
     Order: Optional[int] = None
+    CreatedAt: datetime
+    UpdatedAt: Optional[datetime] = None
+    CreatedBy: str
+    UpdatedBy: Optional[str] = None
 
 class AssignmentCreate(AssignmentBase):
     pass
+
+    
+class AssignmentWithUsers(BaseModel):
+    Id: Optional[int] = None
+    GoalId: Optional[int] = None
+    Goal:Optional[str] = None
+    ParentAssignmentId: Optional[int] = None
+    QuestionText: str
+    Order: Optional[int] = None
+    CreatedAt: datetime = datetime.utcnow()  # Default value
+    UpdatedAt: Optional[datetime] = None
+    CreatedBy: str
+    UpdatedBy: Optional[str] = None
+    AssignedUsers: List[str]  = None# List of assigned users
+   
+class AssignmentsFirstSave(BaseModel):
+    Assignments:List[AssignmentWithUsers] 
+    Goal:str
+    GoalDescription:Optional[str] = None
+    OrganizationId:Optional[int] =None
+    DueDate:Optional[datetime]=None
+    InitiatedBy:Optional[str]=None  
+
 
 class AssignmentUpdate(AssignmentBase):
     UpdatedBy: Optional[str] = None
@@ -149,36 +176,20 @@ class Assignment(AssignmentBase):
         orm_mode = True
 
 
-# AssignmentUser Schema
-class AssignmentUserBase(BaseModel):
+# UserResponse Schema (Merged from AssignmentUser and Response)
+class UserResponseBase(BaseModel):
     AssignmentId: int
     AssignedTo: str
+    Answer: Optional[str] = None
+    Status: Optional[str] = 'Assigned'
 
-class AssignmentUserCreate(AssignmentUserBase):
+class UserResponseCreate(UserResponseBase):
     pass
 
-class AssignmentUser(AssignmentUserBase):
-    CreatedAt: datetime
-    UpdatedAt: Optional[datetime]
-    CreatedBy: str
-    UpdatedBy: Optional[str]
-
-    class Config:
-        orm_mode = True
-
-
-# Response Schema
-class ResponseBase(BaseModel):
-    AssignmentId: int
-    Answer: str
-
-class ResponseCreate(ResponseBase):
-    pass
-
-class ResponseUpdate(ResponseBase):
+class UserResponseUpdate(UserResponseBase):
     UpdatedBy: Optional[str] = None
 
-class Response(ResponseBase):
+class UserResponse(UserResponseBase):
     Id: int
     CreatedAt: datetime
     UpdatedAt: Optional[datetime]
@@ -327,6 +338,10 @@ class FeatureUpdate(FeatureBase):
 
 class Feature(FeatureBase):
     Id: int
+    CreatedAt: datetime
+    UpdatedAt: Optional[datetime]
+    CreatedBy: str
+    UpdatedBy: Optional[str]
 
     class Config:
         orm_mode = True
@@ -345,7 +360,10 @@ class OrganizationFeatureAccessUpdate(OrganizationFeatureAccessBase):
     pass
 
 class OrganizationFeatureAccess(OrganizationFeatureAccessBase):
-    pass
+    CreatedAt: datetime
+    UpdatedAt: Optional[datetime]
+    CreatedBy: str
+    UpdatedBy: Optional[str]
 
     class Config:
         orm_mode = True
@@ -353,7 +371,7 @@ class OrganizationFeatureAccess(OrganizationFeatureAccessBase):
 
 # AuditLog Schema
 class AuditLogBase(BaseModel):
-    UserId: Optional[int] = None
+    UserId: Optional[str] = None  # Changed to string (email) instead of FK
     OrganizationId: Optional[int] = None
     Action: Optional[str] = None
 

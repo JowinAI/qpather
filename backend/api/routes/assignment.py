@@ -20,6 +20,87 @@ def create_assignment(assignment: schemas.AssignmentCreate, db: Session = Depend
     db.commit()
     db.refresh(new_assignment)
     return new_assignment
+# Create multiple assignments and assign them to multiple users
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from typing import List
+from datetime import datetime
+from db import models, schemas
+from api.dependencies.model_utils import get_db
+
+router = APIRouter()
+
+# Create multiple assignments and assign them to multiple users
+@router.post("/assignments/bulk-with-responses", response_model=schemas.AssignmentsFirstSave)
+def create_assignments_with_user_responses(assignments_payload: schemas.AssignmentsFirstSave, db: Session = Depends(get_db)):
+    # Insert the Goal and get its ID
+    new_goal = models.Goal(
+        Title=assignments_payload.Goal,
+        CreatedBy=assignments_payload.InitiatedBy,
+        GoalDescription=assignments_payload.GoalDescription,
+        OrganizationId=assignments_payload.OrganizationId
+    )
+    db.add(new_goal)
+    db.commit()
+    db.refresh(new_goal)
+    goal_id = new_goal.Id
+
+    new_assignments = []
+
+    for assignment in assignments_payload.Assignments:
+        # Create the assignment with the inserted GoalId
+        new_assignment = models.Assignment(
+            GoalId=goal_id,  # Use the newly created GoalId
+            ParentAssignmentId=assignment.ParentAssignmentId,
+            QuestionText=assignment.QuestionText,
+            Order=assignment.Order,
+            CreatedBy=assignment.CreatedBy
+        )
+        db.add(new_assignment)
+        db.commit()  # Commit the assignment to get the AssignmentId
+        db.refresh(new_assignment)
+
+        assigned_users = []
+
+        # Assign the assignment to multiple users in the UserResponse table
+        for user_email in assignment.AssignedUsers:
+            new_user_response = models.UserResponse(
+                AssignmentId=new_assignment.Id,
+                AssignedTo=user_email,
+                Status='Assigned',  # Default to 'Assigned'
+                CreatedBy=assignment.CreatedBy
+            )
+            db.add(new_user_response)
+            assigned_users.append(user_email)  # Collect the user email for the response
+
+        new_assignments.append({
+            "assignment": new_assignment,
+            "assigned_users": assigned_users  # Add assigned users to each assignment
+        })
+
+    db.commit()  # Commit all the records at once for both Assignment and UserResponse
+
+    # Prepare the response that includes assignments and the list of assigned users
+    response = []
+    for entry in new_assignments:
+        assignment = entry["assignment"]
+        assigned_users = entry["assigned_users"]
+        assignment_with_users = schemas.AssignmentWithUsers(
+            Id=assignment.Id,
+            GoalId=assignment.GoalId,
+            ParentAssignmentId=assignment.ParentAssignmentId,
+            QuestionText=assignment.QuestionText,
+            Order=assignment.Order,
+            CreatedAt=assignment.CreatedAt,
+            UpdatedAt=assignment.UpdatedAt,
+            CreatedBy=assignment.CreatedBy,
+            UpdatedBy=assignment.UpdatedBy,
+            AssignedUsers=assigned_users  # Add assigned users in the response
+        )
+        response.append(assignment_with_users)
+
+    return {"Goal": assignments_payload.Goal, "Assignments": response,}
+
 
 # Get assignment by ID
 @router.get("/assignments/{assignment_id}", response_model=schemas.Assignment)
