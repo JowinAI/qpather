@@ -24,42 +24,42 @@ const QuestionGrid = ({ questionsList, setQuestionsList }) => {
     });
   };
 
-// Handle save button to send data to API
-const handleSave = async () => {
-  setIsSubmitting(true);
-  
-  // Prepare the payload for the API call
-  const assignmentsPayload = questionsList.Questions.map((question, index) => ({
-    QuestionText: question.questionText,
-    AssignedUsers: Array.isArray(question.AssignedUsers) ? question.AssignedUsers : question.AssignedUsers ? question.AssignedUsers.split(",") : [],  // Ensure it's an array
-    Order: question.Order || index + 1,  // Ensure the order is set
-    CreatedBy: "admin@example.com",  // Replace with actual CreatedBy user
-    CreatedAt: new Date().toISOString(),  // Current timestamp
-  }));
+  // Handle save button to send data to API
+  const handleSave = async () => {
+    setIsSubmitting(true);
 
-  // Final payload structure matching the backend schema
-  const finalPayload = {
-    Goal: questionsList.Goal,  // Include the common Goal
-    Assignments: assignmentsPayload , // List of assignments
-    DueDate:new Date().toISOString(),
-    InitiatedBy: "admin@example.com",
-    GoalDescription:questionsList.Goal,
-    OrganizationId:1
+    // Prepare the payload for the API call
+    const assignmentsPayload = questionsList.Questions.map((question, index) => ({
+      QuestionText: question.questionText,
+      AssignedUsers: Array.isArray(question.AssignedUsers) ? question.AssignedUsers : question.AssignedUsers ? question.AssignedUsers.split(",") : [],  // Ensure it's an array
+      Order: question.Order || index + 1,  // Ensure the order is set
+      CreatedBy: "admin@example.com",  // Replace with actual CreatedBy user
+      CreatedAt: new Date().toISOString(),  // Current timestamp
+    }));
+
+    // Final payload structure matching the backend schema
+    const finalPayload = {
+      Goal: questionsList.Goal,  // Include the common Goal
+      Assignments: assignmentsPayload, // List of assignments
+      DueDate: new Date().toISOString(),
+      InitiatedBy: "admin@example.com",
+      GoalDescription: questionsList.Goal,
+      OrganizationId: 1
+    };
+
+    try {
+      const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/assignments/bulk-with-responses`;
+      const response = await axios.post(apiUrl, finalPayload);
+      console.log('Response data:', response.data);
+      alert('Assignments and responses successfully created!');
+    } catch (error) {
+      console.error('Error submitting assignments:', error);
+      alert('An error occurred while submitting the data.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  try {
-   
-    const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/assignments/bulk-with-responses`;
-    const response = await axios.post(apiUrl, finalPayload);
-    console.log('Response data:', response.data);
-    alert('Assignments and responses successfully created!');
-  } catch (error) {
-    console.error('Error submitting assignments:', error);
-    alert('An error occurred while submitting the data.');
-  } finally {
-    setIsSubmitting(false);
-  }
-};
   // Handle cancel button
   const handleCancel = () => {
     setQuestionsList({
@@ -71,7 +71,7 @@ const handleSave = async () => {
   return (
     questionsList.Questions.length > 0 && (
       <div className="questions-grid">
-        <h3>Suggested Questions</h3>
+        <h3>Suggested Questions for {questionsList.Goal}</h3>
         <table>
           <thead>
             <tr>
@@ -83,10 +83,11 @@ const handleSave = async () => {
             {questionsList.Questions.map((question, index) => (
               <tr key={index}>
                 <td>
-                  <input
-                    type="text"
+                  <textarea
                     value={question.questionText}
                     onChange={(e) => handleQuestionTextChange(index, e.target.value)}
+                    rows={3}  // Set multiline
+                    style={{ width: '400px' }}  // Double the width
                   />
                 </td>
                 <td>

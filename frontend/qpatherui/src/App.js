@@ -1,76 +1,35 @@
 import React, { useState } from 'react';
-import { Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography, Container, List, ListItem, ListItemText, Box, CssBaseline } from '@mui/material';
-import { styled, ThemeProvider, createTheme } from '@mui/material/styles';
-import './App.css';
+import { Button, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography, List, ListItem, ListItemText, Box, CssBaseline, Container } from '@mui/material';
+import { Col, Row } from 'react-bootstrap';
 import Sidebar from './Sidebar';
 import TeamManagement from './TeamManagement';
-import OrgSettings from './OrgSettings'; // Import OrgSettings component
-import UserSettings from './UserSettings'; // Import UserSettings component
+import OrgSettings from './OrgSettings';
+import UserSettings from './UserSettings';
 import QuestionForm from './QuestionForm';
 import QuestionGrid from './QuestionGrid';
-import OrgChartPage from './OrgChart'; // Import OrgChart component
-
-const drawerWidth = 240;
-
-const Root = styled('div')(({ theme }) => ({
-  display: 'flex',
-}));
-
-const Drawer = styled('div')(({ theme }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-}));
-
-const DrawerPaper = styled('div')(({ theme }) => ({
-  width: drawerWidth,
-}));
-
-const Content = styled('main')(({ theme }) => ({
-  flexGrow: 1,
-  padding: theme.spacing(3),
-  marginLeft: drawerWidth,
-}));
-
-const Toolbar = styled('div')(({ theme }) => theme.mixins.toolbar);
-const theme = createTheme();
+import OrgChartPage from './OrgChart';
+import './App.css';
 
 function App() {
-  const [view, setView] = useState("home"); // Tracks the current view
-  const [selectedRequest, setSelectedRequest] = useState(null); // Tracks the selected open request
-  const [questionAnswers, setQuestionAnswers] = useState({}); // Stores answers to questions
-  const [forwardedQuestions, setForwardedQuestions] = useState([]); // Tracks forwarded questions
-  const [assignedUser, setAssignedUser] = useState(""); // Stores assigned user for forwarding
-  const [openRequests] = useState(["Request 1", "Request 2", "Request 3"]); // Static open requests
-  const [teamMembers] = useState(["User 1", "User 2", "User 3"]); // List of team members for assignment
-  const [showQuestionForm, setShowQuestionForm] = useState(false); // Controls visibility of the question form
+  const [view, setView] = useState("home");
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [questionAnswers, setQuestionAnswers] = useState({});
+  const [forwardedQuestions, setForwardedQuestions] = useState([]);
+  const [assignedUser, setAssignedUser] = useState("");
+  const [openRequests] = useState(["Request 1", "Request 2", "Request 3"]);
+  const [teamMembers] = useState(["User 1", "User 2", "User 3"]);
+  const [showQuestionForm, setShowQuestionForm] = useState(false);
   const [questionsList, setQuestionsList] = useState({
-    Goal: null,  // Default Goal to null, can be updated later
-    Questions: [] , // Empty array for Questions
-    GoalDescription:null
+    Goal: null,
+    Questions: [],
+    GoalDescription: null,
   });
 
   // Handle selecting an open request
   const handleRequestClick = (request) => {
     setSelectedRequest(request);
-    setQuestionAnswers({}); // Reset answers when a new request is selected
-    setForwardedQuestions([]); // Reset forwarded questions
-  };
-
-  // Handle answering a question
-  const handleAnswerChange = (questionIndex, value) => {
-    setQuestionAnswers({
-      ...questionAnswers,
-      [questionIndex]: value,
-    });
-  };
-
-  // Handle forwarding a question
-  const handleForwardChange = (questionIndex) => {
-    setForwardedQuestions((prev) =>
-      prev.includes(questionIndex)
-        ? prev.filter((index) => index !== questionIndex) // Remove if already selected
-        : [...prev, questionIndex] // Add if not selected
-    );
+    setQuestionAnswers({});
+    setForwardedQuestions([]);
   };
 
   // Handle saving the responses and forwarding
@@ -83,7 +42,6 @@ function App() {
     }));
     console.log("Saved Answers: ", answers);
     alert("Answers saved successfully!");
-    // Reset selections after saving
     setSelectedRequest(null);
     setQuestionAnswers({});
     setForwardedQuestions([]);
@@ -92,10 +50,9 @@ function App() {
 
   // Handle "Start New Question" button click
   const handleNewQuestionClick = () => {
-    setShowQuestionForm(true); // Show the form when button is clicked
+    setShowQuestionForm(true);
   };
 
-  // Render the main content based on the selected view
   const renderMainContent = () => {
     if (view === "home") {
       return (
@@ -135,13 +92,15 @@ function App() {
                     <TextField
                       label="Enter your answer"
                       value={questionAnswers[index] || ""}
-                      onChange={(e) => handleAnswerChange(index, e.target.value)}
+                      onChange={(e) => setQuestionAnswers({ ...questionAnswers, [index]: e.target.value })}
                     />
                     <FormControlLabel
                       control={
                         <Checkbox
                           checked={forwardedQuestions.includes(index)}
-                          onChange={() => handleForwardChange(index)}
+                          onChange={() => setForwardedQuestions(prev =>
+                            prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+                          )}
                         />
                       }
                       label="Forward"
@@ -195,16 +154,18 @@ function App() {
   };
 
   return (
-    <Root>
-      <CssBaseline />
-      <Drawer>
-        <Sidebar setView={setView} />
-      </Drawer>
-      <Content>
-        <Toolbar />
-        {renderMainContent()}
-      </Content>
-    </Root>
+    <Container fluid>
+      <Row>
+        <Col md={20} className="sidebar-column">
+          <Sidebar setView={setView} />
+        </Col>
+        <Col md={20} style={{ marginTop: '20px' }}> {/* Add top margin to avoid sticking to top */}
+          <Box className="content-box" style={{ paddingLeft: '5px' }}> {/* Padding for the left alignment */}
+            {renderMainContent()}
+          </Box>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

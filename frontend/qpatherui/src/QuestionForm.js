@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getChatGPTResponse } from './ChatGPTApi';
+import { getChatGPTResponse , getChatGPTResponse2} from './ChatGPTApi';
 
 const QuestionForm = ({ setQuestionsList, setShowQuestionForm }) => {
   const [newQuestion, setNewQuestion] = useState("");
@@ -13,11 +13,11 @@ const QuestionForm = ({ setQuestionsList, setShowQuestionForm }) => {
     if (newQuestion.trim()) {
       setLoading(true);
       const questions = await getChatGPTResponse(context, newQuestion, instruction);
-      
+      const questionsDetail = await getChatGPTResponse2( newQuestion);
       // Common goal for all questions
-      const commonGoal = "Answer the questions to help forecast sales trends.";
+      const commonGoal = questionsDetail.Goal;
 
-      const questionsListNew = questions.map((question, index) => {
+      const questionsListNew = questionsDetail.Questions.map((question, index) => {
         return {
           questionText: question,
           Order: index + 1, // Dynamic index, starting from 1
