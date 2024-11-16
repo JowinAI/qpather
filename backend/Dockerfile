@@ -24,5 +24,8 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 # Copy application code
 COPY . /code
 
-# Start FastAPI with Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8082", "--reload"]
+# Expose port 80
+EXPOSE 80
+
+# Start FastAPI with Uvicorn on port 80
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
