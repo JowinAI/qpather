@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 from db.models import Base
-from api.routes import test, client, organization, department, goal, assignment,  response, organization_settings, user_settings, user, subscription_plan, organization_subscription, billing, feature, organization_feature_access, audit_log
+from api.routes import test, analysis, client, organization, department, goal, assignment,  response, organization_settings, user_settings, user, subscription_plan, organization_subscription, billing, feature, organization_feature_access, audit_log
 import uvicorn
 from db.database import engine
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,6 +28,7 @@ app = FastAPI()
 origins = [
     "http://localhost:3001",  # Allow requests from your React app running on this port
     "http://localhost:3000",  # If you might use another port for React
+    "*"
   
     # Add any other frontend domains you want to allow
 ]
@@ -51,6 +52,7 @@ print("CORS middleware configured with origins: %s", origins)
 Base.metadata.create_all(bind=engine)
 
 # Include the routers for all the different entities
+app.include_router(analysis.router, prefix="/api/v1", tags=["Analysis"])
 app.include_router(client.router, prefix="/api/v1", tags=["Client"])
 app.include_router(organization.router, prefix="/api/v1", tags=["Organization"])
 app.include_router(department.router, prefix="/api/v1", tags=["Department"])
