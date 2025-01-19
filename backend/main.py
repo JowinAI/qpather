@@ -5,18 +5,30 @@ from db.database import engine
 import uvicorn
 import os
 import logging
-\
+from fastapi import APIRouter, HTTPException 
+from fastapi.middleware.cors import CORSMiddleware
+
+
+
 
 
 app = FastAPI()
 
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust origins as necessary
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 logging.info("CORS is completely disabled. All origins, methods, and headers are allowed.")
 
 # Database setup
 
-
+@app.options("/{path:path}")
+async def handle_options():
+    raise HTTPException(status_code=403, detail="CORS disabled")
 # Include routers
 app.include_router(analysis.router, prefix="/api/v1", tags=["Analysis"])
 app.include_router(client.router, prefix="/api/v1", tags=["Client"])
