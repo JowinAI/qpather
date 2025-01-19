@@ -99,4 +99,5 @@ async def breakdown():
 # Mock API route to return hardcoded responses
 @router.post("/breakdown/")
 async def breakdown(request: ChatRequest):
-    return mock_response
+    return {"response": mock_response}
+   
