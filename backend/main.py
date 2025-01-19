@@ -5,25 +5,17 @@ from db.database import engine
 import uvicorn
 import os
 import logging
-from fastapi.middleware.cors import CORSMiddleware
-
+\
 
 
 app = FastAPI()
 
-# Completely disable CORS by allowing all origins, methods, and headers
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],           # Allow all origins
-    allow_credentials=True,        # Allow credentials (cookies, auth headers)
-    allow_methods=["*"],           # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],           # Allow all headers
-)
+
 
 logging.info("CORS is completely disabled. All origins, methods, and headers are allowed.")
 
 # Database setup
-Base.metadata.create_all(bind=engine)
+
 
 # Include routers
 app.include_router(analysis.router, prefix="/api/v1", tags=["Analysis"])
