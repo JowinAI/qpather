@@ -85,12 +85,18 @@ mock_response = {
     ]
 }
 
-@router.get("/breakdown_mock/")
-async def breakdown_mock():
+# Mock data to be returned
+mock_response = {
+    "response": "{\n  \"Goal\": \"Strategies for increasing sales and expanding the team\",\n  \"Questions\": [\n    \"What specific sales strategies have you implemented in the past that have been successful?\",\n    \"What criteria do you consider when hiring new team members to ensure they align with the company's goals and values?\"\n  ]\n}"
+}
+
+@router.get("/breakdown/")
+async def breakdown():
     return {"response": "hi"}
 
 # Mock API route to return hardcoded responses
-@router.post("/breakdown_mock/")
-async def breakdown_mock(request: ChatRequest):
-    return {"response": mock_response}
+@router.post("/breakdown/")
+async def breakdown(request: ChatRequest):
+    return mock_response
+
    
