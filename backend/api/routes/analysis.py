@@ -19,6 +19,10 @@ person_details = {
     "geography": "North America"
 }
 
+@router.get("/breakdown/")
+async def breakdown():
+  return {"response": "hello"}
+
 # API route to interact with OpenAI API
 @router.post("/breakdown/")
 async def breakdown(request: ChatRequest):
