@@ -3,7 +3,8 @@ from pydantic import BaseModel
 import httpx
 import os   
 
-router = APIRouter()
+#router = APIRouter()
+router = APIRouter(strict_slashes=False)
 
 # Replace this with your actual API key or load from environment variables
 API_KEY = os.getenv("OPENAI_API_KEY", "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")
