@@ -7,6 +7,8 @@ import os
 import logging
 from fastapi.middleware.cors import CORSMiddleware
 
+
+
 app = FastAPI()
 
 # Completely disable CORS by allowing all origins, methods, and headers
