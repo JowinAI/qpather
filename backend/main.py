@@ -26,9 +26,7 @@ logging.info("CORS is completely disabled. All origins, methods, and headers are
 
 # Database setup
 
-@app.options("/{path:path}")
-async def handle_options():
-    raise HTTPException(status_code=403, detail="CORS disabled")
+
 # Include routers
 app.include_router(analysis.router, prefix="/api/v1", tags=["Analysis"])
 app.include_router(client.router, prefix="/api/v1", tags=["Client"])
