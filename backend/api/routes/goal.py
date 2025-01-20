@@ -130,6 +130,50 @@ def get_goal_details(goal_id: int, db: Session = Depends(get_db)):
 def get_goals(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     goals = db.query(models.Goal).order_by(models.Goal.Id).offset(skip).limit(limit).all()
     return goals
+@router.get("/goal/summary", response_model=List[schemas.GoalSummary])
+def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    try:
+        # Query to get goals with their assignments and responses
+        goals = (
+            db.query(models.Goal)
+            .outerjoin(models.Assignment, models.Goal.Id == models.Assignment.GoalId)
+            .outerjoin(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
+            .order_by(models.Goal.Id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+        if not goals:
+            raise HTTPException(status_code=404, detail="No goals found")
+
+        goal_summary_list = []
+
+        for goal in goals:
+            # Determine due date display
+            due_date_str = goal.DueDate.strftime("%Y-%m-%d") if goal.DueDate else "No Due Date"
+
+            # Gather assigned users for first-level assignments
+            assigned_users = db.query(models.UserResponse.AssignedTo).join(models.Assignment).filter(
+                models.Assignment.GoalId == goal.Id
+            ).distinct().all()
+
+            assigned_user_list = [user.AssignedTo for user in assigned_users]
+
+            # Create the goal summary response
+            goal_summary_list.append(schemas.GoalSummary(
+                Id=goal.Id,
+                Title=goal.Title,
+                DueDate=due_date_str,
+                Status="In Progress" if goal.DueDate and goal.DueDate > datetime.utcnow() else "Overdue",
+                AssignedUsers=assigned_user_list,
+                ViewLink=f"/goal/details/{goal.Id}"
+            ))
+
+        return goal_summary_list
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 # Update goal by ID
 @router.put("/goal/{goal_id}", response_model=schemas.Goal)
