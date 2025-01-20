@@ -126,11 +126,11 @@ def get_goal_details(goal_id: int, db: Session = Depends(get_db)):
     )
 
 # Get all goals
-@router.get("/mygoals", response_model=List[schemas.Goal])
+@router.get("/goal/mygoals", response_model=List[schemas.Goal])
 def get_goals(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     goals = db.query(models.Goal).order_by(models.Goal.Id).offset(skip).limit(limit).all()
     return goals
-@router.get("/goal/summary", response_model=List[schemas.GoalSummary])
+@router.get("/mygoals", response_model=List[schemas.GoalSummary])
 def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     try:
         # Query to get goals with their assignments and responses
