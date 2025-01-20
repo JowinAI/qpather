@@ -413,3 +413,31 @@ class GoalResponse(BaseModel):
 
     class Config:
         orm_mode = True
+class UserResponseDetail(BaseModel):
+    AssignedTo: str
+    Answer: Optional[str] = None
+    Status: str
+    CreatedAt: datetime
+    UpdatedAt: Optional[datetime]
+
+class AssignmentDetails(BaseModel):
+    Id: int
+    ParentAssignmentId: Optional[int]
+    QuestionText: str
+    Order: Optional[int]
+    CreatedAt: datetime
+    UpdatedAt: Optional[datetime]
+    CreatedBy: str
+    UpdatedBy: Optional[str]
+    UserResponses: List[UserResponseDetail]
+
+class GoalDetailsResponse(BaseModel):
+    Id: int
+    Title: str
+    DueDate: datetime
+    GoalDescription: Optional[str]
+    CreatedAt: datetime
+    UpdatedAt: Optional[datetime]
+    CreatedBy: str
+    UpdatedBy: Optional[str]
+    Assignments: List[AssignmentDetails]

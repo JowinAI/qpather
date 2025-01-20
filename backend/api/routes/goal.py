@@ -7,8 +7,8 @@ from api.dependencies.model_utils import get_db
 router = APIRouter()
 
 
-#Goal Save
-@router.post("/goals/save", response_model=dict)
+#Goal First Save with questions
+@router.post("/goal/save", response_model=dict)
 def save(goal_payload: schemas.GoalWithAssignments, db: Session = Depends(get_db)):
     try:
         # Insert the Goal and get its ID
@@ -55,9 +55,11 @@ def save(goal_payload: schemas.GoalWithAssignments, db: Session = Depends(get_db
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
+
 # Create a new goal
-@router.post("/goals/", response_model=schemas.Goal)
+@router.post("/goal/", response_model=schemas.Goal)
 def create_goal(goal: schemas.GoalCreate, db: Session = Depends(get_db)):
     new_goal = models.Goal(
         OrganizationId=goal.OrganizationId,
@@ -73,21 +75,64 @@ def create_goal(goal: schemas.GoalCreate, db: Session = Depends(get_db)):
     return new_goal
 
 # Get goal by ID
-@router.get("/goals/{goal_id}", response_model=schemas.Goal)
-def get_goal(goal_id: int, db: Session = Depends(get_db)):
+@router.get("/goal/{goal_id}", response_model=schemas.GoalDetailsResponse)
+def get_goal_details(goal_id: int, db: Session = Depends(get_db)):
+    # Retrieve goal details
     goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
-    if goal is None:
+
+    if not goal:
         raise HTTPException(status_code=404, detail="Goal not found")
-    return goal
+
+    # Get first-level assignments for the goal
+    assignments = db.query(models.Assignment).filter(models.Assignment.GoalId == goal_id).all()
+
+    assignment_details = []
+    for assignment in assignments:
+        # Get user responses for each assignment
+        user_responses = db.query(models.UserResponse).filter(models.UserResponse.AssignmentId == assignment.Id).all()
+
+        user_response_list = [
+            schemas.UserResponseDetail(
+                AssignedTo=response.AssignedTo,
+                Answer=response.Answer,
+                Status=response.Status,
+                CreatedAt=response.CreatedAt,
+                UpdatedAt=response.UpdatedAt
+            ) for response in user_responses
+        ]
+
+        assignment_details.append(schemas.AssignmentDetails(
+            Id=assignment.Id,
+            ParentAssignmentId=assignment.ParentAssignmentId,
+            QuestionText=assignment.QuestionText,
+            Order=assignment.Order,
+            CreatedAt=assignment.CreatedAt,
+            UpdatedAt=assignment.UpdatedAt,
+            CreatedBy=assignment.CreatedBy,
+            UpdatedBy=assignment.UpdatedBy,
+            UserResponses=user_response_list
+        ))
+
+    return schemas.GoalDetailsResponse(
+        Id=goal.Id,
+        Title=goal.Title,
+        DueDate=goal.DueDate,
+        GoalDescription=goal.GoalDescription,
+        CreatedAt=goal.CreatedAt,
+        UpdatedAt=goal.UpdatedAt,
+        CreatedBy=goal.CreatedBy,
+        UpdatedBy=goal.UpdatedBy,
+        Assignments=assignment_details
+    )
 
 # Get all goals
-@router.get("/goals/", response_model=List[schemas.Goal])
+@router.get("/goal/", response_model=List[schemas.Goal])
 def get_goals(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     goals = db.query(models.Goal).order_by(models.Goal.Id).offset(skip).limit(limit).all()
     return goals
 
 # Update goal by ID
-@router.put("/goals/{goal_id}", response_model=schemas.Goal)
+@router.put("/goal/{goal_id}", response_model=schemas.Goal)
 def update_goal(goal_id: int, goal: schemas.GoalUpdate, db: Session = Depends(get_db)):
     db_goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
     if db_goal is None:
@@ -104,7 +149,7 @@ def update_goal(goal_id: int, goal: schemas.GoalUpdate, db: Session = Depends(ge
     return db_goal
 
 # Delete goal by ID
-@router.delete("/goals/{goal_id}", response_model=schemas.Goal)
+@router.delete("/goal/{goal_id}", response_model=schemas.Goal)
 def delete_goal(goal_id: int, db: Session = Depends(get_db)):
     db_goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
     if db_goal is None:
