@@ -73,11 +73,11 @@ class User(Base):
 # Goal Table (with DueDate)
 class Goal(Base):
     __tablename__ = 'goal'
-    
+
     Id = Column(Integer, primary_key=True, autoincrement=True)
     OrganizationId = Column(Integer, ForeignKey('organization.Id'), nullable=False)
     Title = Column(String(255), nullable=False)
-    DueDate = Column(DateTime, nullable=False)  # Renamed from Date to DueDate
+    DueDate = Column(DateTime, nullable=True) 
     InitiatedBy = Column(String(255))
     GoalDescription = Column(String(255))
     CreatedAt = Column(DateTime, default=func.now())

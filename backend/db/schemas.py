@@ -114,12 +114,21 @@ class GoalCreate(GoalBase):
 class GoalUpdate(GoalBase):
     UpdatedBy: Optional[str] = None
 
-class Goal(GoalBase):
+class Goal(BaseModel):
     Id: int
+    OrganizationId: int
+    Title: str
+    DueDate: Optional[datetime]  # Allow None values for DueDate
+    InitiatedBy: Optional[str]
+    GoalDescription: Optional[str]
     CreatedAt: datetime
-    UpdatedAt: Optional[datetime]
-    CreatedBy: str
+    UpdatedAt: datetime
+    CreatedBy: Optional[str]
     UpdatedBy: Optional[str]
+    DepartmentId: Optional[int]
+
+    class Config:
+        orm_mode = True
 
     class Config:
         orm_mode = True

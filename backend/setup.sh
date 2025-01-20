@@ -1,3 +1,4 @@
+!/bin/bash
 docker build -t qpather-api .    
 git add * 
 git commit -m"update apis"
