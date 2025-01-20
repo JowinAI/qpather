@@ -6,6 +6,56 @@ from api.dependencies.model_utils import get_db
 
 router = APIRouter()
 
+
+#Goal Save
+@router.post("/goals/save", response_model=dict)
+def save(goal_payload: schemas.GoalWithAssignments, db: Session = Depends(get_db)):
+    try:
+        # Insert the Goal and get its ID
+        new_goal = models.Goal(
+            OrganizationId=goal_payload.organization_id,
+            Title=goal_payload.title,
+            DueDate=goal_payload.due_date,
+            GoalDescription=goal_payload.description,
+            CreatedBy=goal_payload.created_by.email,
+            DepartmentId=goal_payload.department_id
+        )
+        db.add(new_goal)
+        db.commit()
+        db.refresh(new_goal)
+        goal_id = new_goal.Id
+
+        for idx, question in enumerate(goal_payload.questions, start=1):
+            # Create assignment entry with sequential order
+            new_assignment = models.Assignment(
+                GoalId=goal_id,
+                ParentAssignmentId=None,  # Assuming root-level assignments
+                QuestionText=question.text,
+                Order=idx,
+                CreatedBy=goal_payload.created_by.email
+            )
+            db.add(new_assignment)
+            db.commit()
+            db.refresh(new_assignment)
+
+            # Assign users to assignments
+            for user in question.assigned_users:
+                new_user_response = models.UserResponse(
+                    AssignmentId=new_assignment.Id,
+                    AssignedTo=user.email,
+                    Status='Assigned',
+                    CreatedBy=goal_payload.created_by.email
+                )
+                db.add(new_user_response)
+
+        db.commit()  # Commit all assignments and responses
+
+        return {"goal_id": goal_id}
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    
 # Create a new goal
 @router.post("/goals/", response_model=schemas.Goal)
 def create_goal(goal: schemas.GoalCreate, db: Session = Depends(get_db)):
