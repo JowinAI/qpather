@@ -126,7 +126,7 @@ def get_goal_details(goal_id: int, db: Session = Depends(get_db)):
     )
 
 # Get all goals
-@router.get("/goal/", response_model=List[schemas.Goal])
+@router.get("/goal/mygoals", response_model=List[schemas.Goal])
 def get_goals(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     goals = db.query(models.Goal).order_by(models.Goal.Id).offset(skip).limit(limit).all()
     return goals
@@ -175,22 +175,22 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
-# Update goal by ID
-# @router.put("/goal/{goal_id}", response_model=schemas.Goal)
-# def update_goal(goal_id: int, goal: schemas.GoalUpdate, db: Session = Depends(get_db)):
-#     db_goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
-#     if db_goal is None:
-#         raise HTTPException(status_code=404, detail="Goal not found")
+#Update goal by ID
+@router.put("/goal/{goal_id}", response_model=schemas.Goal)
+def update_goal(goal_id: int, goal: schemas.GoalUpdate, db: Session = Depends(get_db)):
+    db_goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
+    if db_goal is None:
+        raise HTTPException(status_code=404, detail="Goal not found")
     
-#     db_goal.OrganizationId = goal.OrganizationId
-#     db_goal.Title = goal.Title
-#     db_goal.DueDate = goal.DueDate  # Changed from Date to DueDate
-#     db_goal.InitiatedBy = goal.InitiatedBy
-#     db_goal.GoalDescription = goal.GoalDescription
-#     db_goal.UpdatedBy = goal.UpdatedBy
-#     db.commit()
-#     db.refresh(db_goal)
-#     return db_goal
+    db_goal.OrganizationId = goal.OrganizationId
+    db_goal.Title = goal.Title
+    db_goal.DueDate = goal.DueDate  # Changed from Date to DueDate
+    db_goal.InitiatedBy = goal.InitiatedBy
+    db_goal.GoalDescription = goal.GoalDescription
+    db_goal.UpdatedBy = goal.UpdatedBy
+    db.commit()
+    db.refresh(db_goal)
+    return db_goal
 
 # Delete goal by ID
 @router.delete("/goal/{goal_id}", response_model=schemas.Goal)
