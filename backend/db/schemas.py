@@ -450,3 +450,15 @@ class GoalDetailsResponse(BaseModel):
     CreatedBy: str
     UpdatedBy: Optional[str]
     Assignments: List[AssignmentDetails]
+
+
+class GoalSummary(BaseModel):
+    Id: int
+    Title: str
+    DueDate: str  # Formatted as string to display properly
+    Status: str
+    AssignedUsers: List[str]  # List of assigned user emails
+    ViewLink: str
+
+    class Config:
+        orm_mode = True
