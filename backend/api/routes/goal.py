@@ -74,9 +74,7 @@ def create_goal(goal: schemas.GoalCreate, db: Session = Depends(get_db)):
     db.refresh(new_goal)
     return new_goal
 
-# Get goal by ID
-@router.get("/goal/{goal_id}", response_model=schemas.GoalDetailsResponse)
-def get_goal_details(goal_id: int, db: Session = Depends(get_db)):
+
     # Retrieve goal details
     goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
 
@@ -175,6 +173,9 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
+# Get goal by ID
+@router.get("/goal/{goal_id}", response_model=schemas.GoalDetailsResponse)
+def get_goal_details(goal_id: int, db: Session = Depends(get_db)):
 # Update goal by ID
 @router.put("/goal/{goal_id}", response_model=schemas.Goal)
 def update_goal(goal_id: int, goal: schemas.GoalUpdate, db: Session = Depends(get_db)):
