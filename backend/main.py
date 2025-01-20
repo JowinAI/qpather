@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 from db.models import Base
-from api.routes import test, analysis, client, organization, department, goal, assignment, response, organization_settings, user_settings, user, subscription_plan, organization_subscription, billing, feature, organization_feature_access, audit_log
+from api.routes import test, analysis,aiagent, client, organization, department, goal, assignment, response, organization_settings, user_settings, user, subscription_plan, organization_subscription, billing, feature, organization_feature_access, audit_log
 from db.database import engine
 import uvicorn
 import os
@@ -28,6 +28,7 @@ logging.info("CORS is completely disabled. All origins, methods, and headers are
 
 
 # Include routers
+#app.include_router(aiagent.router, prefix="/api/v1", tags=["AIAgent"])
 app.include_router(analysis.router, prefix="/api/v1", tags=["Analysis"])
 app.include_router(client.router, prefix="/api/v1", tags=["Client"])
 app.include_router(organization.router, prefix="/api/v1", tags=["Organization"])

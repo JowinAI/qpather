@@ -176,7 +176,6 @@ class Assignment(AssignmentBase):
         orm_mode = True
 
 
-# UserResponse Schema (Merged from AssignmentUser and Response)
 class UserResponseBase(BaseModel):
     AssignmentId: int
     AssignedTo: str
@@ -381,6 +380,36 @@ class AuditLogCreate(AuditLogBase):
 class AuditLog(AuditLogBase):
     Id: int
     Timestamp: datetime
+
+    class Config:
+        orm_mode = True
+
+
+# Schema for user details used in assignments
+class AssignmentUser(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+
+# Schema for questions within a goal
+class Question(BaseModel):
+    text: str
+    assigned_users: List[AssignmentUser]
+
+# GoalWithAssignments schema for incoming goal data with assignments
+class GoalWithAssignments(BaseModel):
+    title: str
+    description: str
+    due_date: datetime
+    department_id: int
+    organization_id: int
+    created_by: AssignmentUser
+    questions: List[Question]
+
+# Response schema for goal creation with assignments
+class GoalResponse(BaseModel):
+    Goal: str
+    Assignments: List[AssignmentWithUsers]
 
     class Config:
         orm_mode = True

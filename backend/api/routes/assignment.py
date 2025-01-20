@@ -101,6 +101,86 @@ def create_assignments_with_user_responses(assignments_payload: schemas.Assignme
 
     return {"Goal": assignments_payload.Goal, "Assignments": response,}
 
+@router.post("/goals/first-save", response_model=schemas.GoalWithAssignments)
+def first_save(goal_payload: schemas.GoalWithAssignments, db: Session = Depends(get_db)):
+    try:
+        # Insert the Goal and get its ID
+        new_goal = models.Goal(
+            OrganizationId=goal_payload.organization_id,
+            Title=goal_payload.title,
+            DueDate=goal_payload.due_date,
+            GoalDescription=goal_payload.description,
+            CreatedBy=goal_payload.created_by.email,
+            DepartmentId=goal_payload.department_id
+        )
+        db.add(new_goal)
+        db.commit()
+        db.refresh(new_goal)
+        goal_id = new_goal.Id
+
+        new_assignments = []
+
+        for idx, question in enumerate(goal_payload.questions, start=1):
+            # Create assignment entry with sequential order
+            new_assignment = models.Assignment(
+                GoalId=goal_id,
+                ParentAssignmentId=None,  # Assuming root level assignments
+                QuestionText=question.text,
+                Order=idx,
+                CreatedBy=goal_payload.created_by.email
+            )
+            db.add(new_assignment)
+            db.commit()
+            db.refresh(new_assignment)
+
+            assigned_users = []
+
+            # Assign users to assignments
+            for user in question.assigned_users:
+                new_user_response = models.UserResponse(
+                    AssignmentId=new_assignment.Id,
+                    AssignedTo=user.email,
+                    Status='Assigned',
+                    CreatedBy=goal_payload.created_by.email
+                )
+                db.add(new_user_response)
+                assigned_users.append(user.email)
+
+            new_assignments.append({
+                "assignment": new_assignment,
+                "assigned_users": assigned_users
+            })
+
+        db.commit()  # Commit all assignments and responses
+
+        # Prepare response structure
+        response = []
+        for entry in new_assignments:
+            assignment = entry["assignment"]
+            assigned_users = entry["assigned_users"]
+            assignment_with_users = schemas.AssignmentWithUsers(
+                Id=assignment.Id,
+                GoalId=assignment.GoalId,
+                ParentAssignmentId=assignment.ParentAssignmentId,
+                QuestionText=assignment.QuestionText,
+                Order=assignment.Order,
+                CreatedAt=assignment.CreatedAt,
+                UpdatedAt=assignment.UpdatedAt,
+                CreatedBy=assignment.CreatedBy,
+                UpdatedBy=assignment.UpdatedBy,
+                AssignedUsers=assigned_users
+            )
+            response.append(assignment_with_users)
+
+        return {
+            "Goal": goal_payload.title,
+            "Assignments": response
+        }
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    
 
 # Get assignment by ID
 @router.get("/assignments/{assignment_id}", response_model=schemas.Assignment)
