@@ -84,7 +84,7 @@ class Goal(Base):
     UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
     CreatedBy = Column(String(255))
     UpdatedBy = Column(String(255), nullable=True)
-    
+    DepartmentId=Column(Integer, nullable=True)
     organization = relationship("Organization")
 
 # Assignment Table
