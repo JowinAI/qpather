@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from db import models, schemas
 from api.dependencies.model_utils import get_db
+from datetime import datetime
 
 router = APIRouter()
 
@@ -130,7 +131,7 @@ def get_goal_details(goal_id: int, db: Session = Depends(get_db)):
 # def get_goals(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 #     goals = db.query(models.Goal).order_by(models.Goal.Id).offset(skip).limit(limit).all()
 #     return goals
-@router.get("/", response_model=List[schemas.GoalSummary])
+@router.get("/mygoals", response_model=List[schemas.GoalSummary])
 def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     try:
         # Query to get goals with their assignments and responses
@@ -165,7 +166,7 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
                 Id=goal.Id,
                 Title=goal.Title,
                 DueDate=due_date_str,
-                Status="In Progress" if goal.DueDate and goal.DueDate > datetime.utcnow() else "Overdue",
+                Status="In Progress" if goal.DueDate and goal.DueDate > datetime.now(datetime.timezone.utc)  else "Overdue",
                 AssignedUsers=assigned_user_list,
                 ViewLink=f"/goal/details/{goal.Id}"
             ))
