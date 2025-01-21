@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from db import models, schemas
 from api.dependencies.model_utils import get_db
-from datetime import datetime
+from datetime import datetime, timezone
 
 router = APIRouter()
 
