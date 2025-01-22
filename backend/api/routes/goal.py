@@ -151,8 +151,8 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
         goal_summary_list = []
 
         for goal in goals:
-            # Handle null DueDate by providing a default string
-            due_date_str = "No Due Date" if goal.DueDate is None else goal.DueDate.strftime("%Y-%m-%d")
+            # Determine due date display
+            due_date_str = goal.DueDate.strftime("%Y-%m-%d") if goal.DueDate else "No Due Date"
 
             # Gather assigned users for first-level assignments
             assigned_users = db.query(models.UserResponse.AssignedTo).join(models.Assignment).filter(
@@ -161,47 +161,22 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
             assigned_user_list = [user.AssignedTo for user in assigned_users]
 
-            # Get current UTC time
-            utc_time = datetime.now(timezone.utc)
-
-            # Determine status based on DueDate
-            if goal.DueDate:
-                goal_due_date_utc = goal.DueDate.astimezone(timezone.utc) if goal.DueDate.tzinfo else goal.DueDate.replace(tzinfo=timezone.utc)
-                status = "In Progress" if goal_due_date_utc > utc_time else "Overdue"
-            else:
-                status = "No Due Date"
-
+            local_now = datetime.now()
+            utc_time = local_now.astimezone(timezone.utc)
             # Create the goal summary response
             goal_summary_list.append(schemas.GoalSummary(
                 Id=goal.Id,
                 Title=goal.Title,
                 DueDate=due_date_str,
-                Status=status,
-                AssignedUsers=assigned_user_list#,
-                #ViewLink=f"/goal/details/{goal.Id}"
+                Status="In Progress" if goal.DueDate and goal.DueDate.replace(tzinfo=timezone.utc) > utc_time  else "Overdue",
+                AssignedUsers=assigned_user_list,
+                ViewLink=f"/goal/details/{goal.Id}"
             ))
 
         return goal_summary_list
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
-
-#Update goal by ID
-@router.put("/goal/{goal_id}", response_model=schemas.Goal)
-def update_goal(goal_id: int, goal: schemas.GoalUpdate, db: Session = Depends(get_db)):
-    db_goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
-    if db_goal is None:
-        raise HTTPException(status_code=404, detail="Goal not found")
-    
-    db_goal.OrganizationId = goal.OrganizationId
-    db_goal.Title = goal.Title
-    db_goal.DueDate = goal.DueDate  # Changed from Date to DueDate
-    db_goal.InitiatedBy = goal.InitiatedBy
-    db_goal.GoalDescription = goal.GoalDescription
-    db_goal.UpdatedBy = goal.UpdatedBy
-    db.commit()
-    db.refresh(db_goal)
-    return db_goal
 
 # Delete goal by ID
 @router.delete("/goal/{goal_id}", response_model=schemas.Goal)

@@ -450,7 +450,7 @@ class GoalDetailsResponse(BaseModel):
     CreatedBy: str
     UpdatedBy: Optional[str]
     Assignments: List[AssignmentDetails]
-
+    
 
 class GoalSummary(BaseModel):
     Id: int
