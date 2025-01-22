@@ -151,7 +151,7 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
         goal_summary_list = []
 
         for goal in goals:
-            # Determine due date display
+            # Handle null DueDate by providing a default string
             due_date_str = goal.DueDate.strftime("%Y-%m-%d") if goal.DueDate else "No Due Date"
 
             # Gather assigned users for first-level assignments
@@ -161,14 +161,22 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
             assigned_user_list = [user.AssignedTo for user in assigned_users]
 
-            local_now = datetime.now()
-            utc_time = local_now.astimezone(timezone.utc)
+            # Get current UTC time
+            utc_time = datetime.now(timezone.utc)
+
+            # Determine status based on DueDate
+            if goal.DueDate:
+                goal_due_date_utc = goal.DueDate.astimezone(timezone.utc) if goal.DueDate.tzinfo else goal.DueDate.replace(tzinfo=timezone.utc)
+                status = "In Progress" if goal_due_date_utc > utc_time else "Overdue"
+            else:
+                status = "No Due Date"
+
             # Create the goal summary response
             goal_summary_list.append(schemas.GoalSummary(
                 Id=goal.Id,
                 Title=goal.Title,
                 DueDate=due_date_str,
-                Status="In Progress" if goal.DueDate and goal.DueDate.replace(tzinfo=timezone.utc) > utc_time  else "Overdue",
+                Status=status,
                 AssignedUsers=assigned_user_list,
                 ViewLink=f"/goal/details/{goal.Id}"
             ))
