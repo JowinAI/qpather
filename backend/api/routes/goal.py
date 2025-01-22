@@ -168,7 +168,7 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
                 Id=goal.Id,
                 Title=goal.Title,
                 DueDate=due_date_str,
-                Status="In Progress" if goal.DueDate and goal.DueDate > utc_time  else "Overdue",
+                Status="In Progress" if goal.DueDate and goal.DueDate.replace(tzinfo=timezone.utc) > utc_time  else "Overdue",
                 AssignedUsers=assigned_user_list,
                 ViewLink=f"/goal/details/{goal.Id}"
             ))
