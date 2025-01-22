@@ -161,12 +161,14 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
             assigned_user_list = [user.AssignedTo for user in assigned_users]
 
+            local_now = datetime.now()
+            utc_time = local_now.astimezone(timezone.utc)
             # Create the goal summary response
             goal_summary_list.append(schemas.GoalSummary(
                 Id=goal.Id,
                 Title=goal.Title,
                 DueDate=due_date_str,
-                Status="In Progress" if goal.DueDate and goal.DueDate > datetime.now()  else "Overdue",
+                Status="In Progress" if goal.DueDate and goal.DueDate > utc_time  else "Overdue",
                 AssignedUsers=assigned_user_list,
                 ViewLink=f"/goal/details/{goal.Id}"
             ))
