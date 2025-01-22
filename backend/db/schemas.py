@@ -104,7 +104,7 @@ class User(UserBase):
 class GoalBase(BaseModel):
     OrganizationId: int
     Title: str
-    DueDate: datetime
+    DueDate: Optional[datetime] 
     InitiatedBy: Optional[str] = None
     GoalDescription: Optional[str] = None
 
@@ -443,7 +443,7 @@ class AssignmentDetails(BaseModel):
 class GoalDetailsResponse(BaseModel):
     Id: int
     Title: str
-    DueDate: datetime
+    DueDate: Optional[datetime] 
     GoalDescription: Optional[str]
     CreatedAt: datetime
     UpdatedAt: Optional[datetime]
