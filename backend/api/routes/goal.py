@@ -152,7 +152,7 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
         for goal in goals:
             # Handle null DueDate by providing a default string
-            due_date_str = goal.DueDate.strftime("%Y-%m-%d") if goal.DueDate else "No Due Date"
+            due_date_str = "No Due Date" if goal.DueDate is None else goal.DueDate.strftime("%Y-%m-%d")
 
             # Gather assigned users for first-level assignments
             assigned_users = db.query(models.UserResponse.AssignedTo).join(models.Assignment).filter(
@@ -177,8 +177,8 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
                 Title=goal.Title,
                 DueDate=due_date_str,
                 Status=status,
-                AssignedUsers=assigned_user_list,
-                ViewLink=f"/goal/details/{goal.Id}"
+                AssignedUsers=assigned_user_list#,
+                #ViewLink=f"/goal/details/{goal.Id}"
             ))
 
         return goal_summary_list
