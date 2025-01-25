@@ -146,8 +146,8 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
                 models.Goal.Id,
                 models.Goal.Title,
                 models.Goal.DueDate,
-                models.Goal.CreatedDate,
-                func.row_number().over(order_by=models.Goal.CreatedDate.desc()).label("seq_num")
+                models.Goal.CreatedAt,
+                func.row_number().over(order_by=models.Goal.CreatedAt.desc()).label("seq_num")
             )
             .outerjoin(models.Assignment, models.Goal.Id == models.Assignment.GoalId)
             .outerjoin(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
