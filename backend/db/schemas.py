@@ -428,6 +428,10 @@ class UserResponseDetail(BaseModel):
     Status: str
     CreatedAt: datetime
     UpdatedAt: Optional[datetime]
+    
+class PaginatedGoalSummary(BaseModel):
+    total: int
+    items: List[schemas.GoalSummary]    
 
 class AssignmentDetails(BaseModel):
     Id: int
@@ -450,7 +454,7 @@ class GoalDetailsResponse(BaseModel):
     CreatedBy: str
     UpdatedBy: Optional[str]
     Assignments: List[AssignmentDetails]
-    
+
 
 class GoalSummary(BaseModel):
     Id: int

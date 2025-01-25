@@ -131,10 +131,14 @@ def get_goal_details(goal_id: int, db: Session = Depends(get_db)):
 # def get_goals(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 #     goals = db.query(models.Goal).order_by(models.Goal.Id).offset(skip).limit(limit).all()
 #     return goals
-@router.get("/mygoals", response_model=List[schemas.GoalSummary])
+
+@router.get("/mygoals", response_model=PaginatedGoalSummary)
 def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     try:
-        # Query to get goals with their assignments and responses
+        # Calculate total count of goals
+        total_goals = db.query(func.count(models.Goal.id)).scalar()
+
+        # Query to get paginated goals with their assignments and responses
         goals = (
             db.query(models.Goal)
             .outerjoin(models.Assignment, models.Goal.Id == models.Assignment.GoalId)
@@ -163,20 +167,22 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
             local_now = datetime.now()
             utc_time = local_now.astimezone(timezone.utc)
+
             # Create the goal summary response
             goal_summary_list.append(schemas.GoalSummary(
                 Id=goal.Id,
                 Title=goal.Title,
                 DueDate=due_date_str,
-                Status="In Progress" if goal.DueDate and goal.DueDate.replace(tzinfo=timezone.utc) > utc_time  else "Overdue",
+                Status="In Progress" if goal.DueDate and goal.DueDate.replace(tzinfo=timezone.utc) > utc_time else "Overdue",
                 AssignedUsers=assigned_user_list,
                 ViewLink=f"/goal/details/{goal.Id}"
             ))
 
-        return goal_summary_list
+        return PaginatedGoalSummary(total=total_goals, items=goal_summary_list)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
 
 # Delete goal by ID
 @router.delete("/goal/{goal_id}", response_model=schemas.Goal)
