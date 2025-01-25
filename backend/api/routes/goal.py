@@ -149,9 +149,7 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
                 models.Goal.CreatedAt,
                 func.row_number().over(order_by=models.Goal.CreatedAt.desc()).label("seq_num")
             )
-            .outerjoin(models.Assignment, models.Goal.Id == models.Assignment.GoalId)
-            .outerjoin(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
-            .distinct(models.Goal.Id)
+            .group_by(models.Goal.Id, models.Goal.Title, models.Goal.DueDate, models.Goal.CreatedAt)
             .subquery()
         )
 
@@ -184,6 +182,7 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
 
 
 
