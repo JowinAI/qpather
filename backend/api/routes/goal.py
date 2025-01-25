@@ -151,6 +151,7 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
             )
             .outerjoin(models.Assignment, models.Goal.Id == models.Assignment.GoalId)
             .outerjoin(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
+            .distinct(models.Goal.Id)
             .subquery()
         )
 
@@ -165,36 +166,25 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
         if not goals:
             raise HTTPException(status_code=404, detail="No goals found")
 
-        goal_summary_list = []
-
-        for goal in goals:
-            # Determine due date display
-            due_date_str = goal.DueDate.strftime("%Y-%m-%d") if goal.DueDate else "No Due Date"
-
-            # Gather assigned users for first-level assignments
-            assigned_users = db.query(models.UserResponse.AssignedTo).join(models.Assignment).filter(
-                models.Assignment.GoalId == goal.Id
-            ).distinct().all()
-
-            assigned_user_list = [user.AssignedTo for user in assigned_users]
-
-            local_now = datetime.now()
-            utc_time = local_now.astimezone(timezone.utc)
-
-            # Create the goal summary response
-            goal_summary_list.append(schemas.GoalSummary(
+        goal_summary_list = [
+            schemas.GoalSummary(
                 Id=goal.Id,
                 Title=goal.Title,
-                DueDate=due_date_str,
-                Status="In Progress" if goal.DueDate and goal.DueDate.replace(tzinfo=timezone.utc) > utc_time else "Overdue",
-                AssignedUsers=assigned_user_list,
+                DueDate=goal.DueDate.strftime("%Y-%m-%d") if goal.DueDate else "No Due Date",
+                Status="In Progress" if goal.DueDate and goal.DueDate.replace(tzinfo=timezone.utc) > datetime.now().astimezone(timezone.utc) else "Overdue",
+                AssignedUsers=[user.AssignedTo for user in db.query(models.UserResponse.AssignedTo)
+                               .join(models.Assignment)
+                               .filter(models.Assignment.GoalId == goal.Id)
+                               .distinct().all()],
                 ViewLink=f"/goal/details/{goal.Id}"
-            ))
+            ) for goal in goals
+        ]
 
         return schemas.PaginatedGoalSummary(total=total_goals, items=goal_summary_list)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
 
 
 # Delete goal by ID
