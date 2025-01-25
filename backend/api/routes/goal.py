@@ -138,7 +138,7 @@ from db import models, schemas
 def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     try:
         # Calculate total count of goals
-        total_goals = db.query(func.count(models.Goal.id)).scalar()
+        total_goals = db.query(func.count(models.Goal.Id)).scalar()
 
         # Query to get paginated goals with their assignments and responses
         goals = (
