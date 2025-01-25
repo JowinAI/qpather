@@ -4,6 +4,7 @@ from typing import List
 from db import models, schemas
 from api.dependencies.model_utils import get_db
 from datetime import datetime, timezone
+from sqlalchemy import func
 
 router = APIRouter()
 
@@ -132,7 +133,8 @@ def get_goal_details(goal_id: int, db: Session = Depends(get_db)):
 #     goals = db.query(models.Goal).order_by(models.Goal.Id).offset(skip).limit(limit).all()
 #     return goals
 
-@router.get("/mygoals", response_model=PaginatedGoalSummary)
+from db import models, schemas
+@router.get("/mygoals", response_model=schemas.PaginatedGoalSummary)
 def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     try:
         # Calculate total count of goals
@@ -178,7 +180,7 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
                 ViewLink=f"/goal/details/{goal.Id}"
             ))
 
-        return PaginatedGoalSummary(total=total_goals, items=goal_summary_list)
+        return schemas.PaginatedGoalSummary(total=total_goals, items=goal_summary_list)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
