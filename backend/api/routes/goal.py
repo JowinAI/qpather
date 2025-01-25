@@ -133,20 +133,31 @@ def get_goal_details(goal_id: int, db: Session = Depends(get_db)):
 #     goals = db.query(models.Goal).order_by(models.Goal.Id).offset(skip).limit(limit).all()
 #     return goals
 
-from db import models, schemas
+
 @router.get("/mygoals", response_model=schemas.PaginatedGoalSummary)
 def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     try:
         # Calculate total count of goals
         total_goals = db.query(func.count(models.Goal.Id)).scalar()
 
-        # Query to get paginated goals with their assignments and responses
-        goals = (
-            db.query(models.Goal)
+        # Create a subquery to assign sequence numbers based on CreatedDate descending
+        subquery = (
+            db.query(
+                models.Goal.Id,
+                models.Goal.Title,
+                models.Goal.DueDate,
+                models.Goal.CreatedDate,
+                func.row_number().over(order_by=models.Goal.CreatedDate.desc()).label("seq_num")
+            )
             .outerjoin(models.Assignment, models.Goal.Id == models.Assignment.GoalId)
             .outerjoin(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
-            .order_by(models.Goal.Id)
-            .offset(skip)
+            .subquery()
+        )
+
+        # Apply the new sequence number for skipping and limiting records
+        goals = (
+            db.query(subquery)
+            .filter(subquery.c.seq_num > skip)
             .limit(limit)
             .all()
         )
