@@ -33,7 +33,7 @@ async def breakdown(request: ChatRequest):
         - Company Geography: {person_details['geography']}
         
         Please provide responses based on the user's background.
-        
+        Provide upto 5 questions or statements.
         The response must be in the following JSON format:
         {{
           "Goal": "one title line for what the user is trying to achieve",
