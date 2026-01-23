@@ -21,7 +21,10 @@ db_name = os.environ.get("DB_NAME")
 
 if db_server and db_user and db_password and db_name:
     # Use Azure configuration
-    connection_string = f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:1433/{db_name}?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
+    from urllib.parse import quote_plus
+    encoded_user = quote_plus(db_user)
+    encoded_password = quote_plus(db_password)
+    connection_string = f"mssql+pyodbc://{encoded_user}:{encoded_password}@{db_server}:1433/{db_name}?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
 else:
     # Fallback to hardcoded development database
     connection_string = "mssql+pyodbc://db_aa36ea_qpather_admin:Nijesh2024@SQL5112.site4now.net:1433/db_aa36ea_qpather?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
