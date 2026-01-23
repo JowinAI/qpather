@@ -19,7 +19,6 @@ def create_user_response(user_response: schemas.UserResponseCreate, db: Session 
     if existing_response:
         # Update existing record
         existing_response.Answer = user_response.Answer
-        existing_response.Attachments = user_response.Attachments
         existing_response.Status = user_response.Status
         existing_response.UpdatedBy = user_response.CreatedBy # Using CreatedBy as updater
         existing_response.UpdatedAt = datetime.now(timezone.utc)
@@ -32,7 +31,6 @@ def create_user_response(user_response: schemas.UserResponseCreate, db: Session 
             AssignmentId=user_response.AssignmentId,
             AssignedTo=user_response.AssignedTo,
             Answer=user_response.Answer,
-            Attachments=user_response.Attachments,
             Status=user_response.Status,
             CreatedBy=user_response.CreatedBy
         )
@@ -80,7 +78,6 @@ def update_user_response(response_id: int, user_response: schemas.UserResponseUp
     db_user_response.AssignmentId = user_response.AssignmentId
     db_user_response.AssignedTo = user_response.AssignedTo
     db_user_response.Answer = user_response.Answer
-    db_user_response.Attachments = user_response.Attachments
     db_user_response.Status = user_response.Status
     db_user_response.UpdatedBy = user_response.UpdatedBy
     db.commit()

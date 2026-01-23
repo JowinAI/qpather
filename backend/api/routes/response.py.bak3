@@ -80,7 +80,6 @@ def update_user_response(response_id: int, user_response: schemas.UserResponseUp
     db_user_response.AssignmentId = user_response.AssignmentId
     db_user_response.AssignedTo = user_response.AssignedTo
     db_user_response.Answer = user_response.Answer
-    db_user_response.Attachments = user_response.Attachments
     db_user_response.Status = user_response.Status
     db_user_response.UpdatedBy = user_response.UpdatedBy
     db.commit()

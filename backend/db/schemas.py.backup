@@ -190,7 +190,6 @@ class UserResponseBase(BaseModel):
     AssignmentId: int
     AssignedTo: str
     Answer: Optional[str] = None
-    Attachments: Optional[str] = None
     Status: Optional[str] = 'Assigned'
     CreatedBy: Optional[str] = None
 
@@ -410,10 +409,9 @@ class Question(BaseModel):
 
 # GoalWithAssignments schema for incoming goal data with assignments
 class GoalWithAssignments(BaseModel):
-    goal_id: Optional[int] = None
     title: str
     description: str
-    due_date: Optional[datetime] = None
+    due_date: datetime
     department_id: int
     organization_id: int
     created_by: AssignmentUser
@@ -429,7 +427,6 @@ class GoalResponse(BaseModel):
 class UserResponseDetail(BaseModel):
     AssignedTo: str
     Answer: Optional[str] = None
-    Attachments: Optional[str] = None
     Status: str
     CreatedAt: datetime
     UpdatedAt: Optional[datetime]
@@ -476,13 +473,3 @@ class PaginatedGoalSummary(BaseModel):
 class AssignmentWithStatus(Assignment):
     Status: str
     Answer: Optional[str] = None    
-    Attachments: Optional[str] = None
-    DelegatedUsers: List[str] = []
-
-# Delegated Assignment Create Schema
-class DelegatedAssignmentCreate(BaseModel):
-    GoalId: int
-    ParentAssignmentId: Optional[int]
-    QuestionText: str
-    AssignedToEmail: EmailStr
-    CreatedBy: str
