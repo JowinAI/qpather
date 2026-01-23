@@ -13,46 +13,112 @@ router = APIRouter()
 @router.post("/goal/save", response_model=dict)
 def save(goal_payload: schemas.GoalWithAssignments, db: Session = Depends(get_db)):
     try:
-        # Insert the Goal and get its ID
-        new_goal = models.Goal(
-            OrganizationId=goal_payload.organization_id,
-            Title=goal_payload.title,
-            DueDate=goal_payload.due_date,
-            GoalDescription=goal_payload.description,
-            CreatedBy=goal_payload.created_by.email,
-            DepartmentId=goal_payload.department_id
-        )
-        db.add(new_goal)
-        db.commit()
-        db.refresh(new_goal)
-        goal_id = new_goal.Id
+        if goal_payload.goal_id:
+            # Update existing goal
+            goal = db.query(models.Goal).filter(models.Goal.Id == goal_payload.goal_id).first()
+            if not goal:
+                raise HTTPException(status_code=404, detail="Goal not found")
+            
+            goal.Title = goal_payload.title
+            goal.GoalDescription = goal_payload.description
+            goal.DueDate = goal_payload.due_date
+            goal.OrganizationId = goal_payload.organization_id
+            goal.DepartmentId = goal_payload.department_id
+            
+            # Fetch existing assignments
+            existing_assignments = db.query(models.Assignment).filter(models.Assignment.GoalId == goal.Id).order_by(models.Assignment.Order).all()
+            
+            # Update assignments and their user responses
+            for idx, question in enumerate(goal_payload.questions):
+                if idx < len(existing_assignments):
+                    assignment = existing_assignments[idx]
+                    assignment.QuestionText = question.text
+                else:
+                    # Create new assignment if payload has more questions
+                    assignment = models.Assignment(
+                        GoalId=goal.Id,
+                        QuestionText=question.text,
+                        Order=idx + 1,
+                        CreatedBy=goal_payload.created_by.email
+                    )
+                    db.add(assignment)
+                    db.flush() # Get ID
+                    db.refresh(assignment)
 
-        for idx, question in enumerate(goal_payload.questions, start=1):
-            # Create assignment entry with sequential order
-            new_assignment = models.Assignment(
-                GoalId=goal_id,
-                ParentAssignmentId=None,  # Assuming root-level assignments
-                QuestionText=question.text,
-                Order=idx,
-                CreatedBy=goal_payload.created_by.email
-            )
-            db.add(new_assignment)
+                # Update User Responses (Assigned Users)
+                # Get current assigned users
+                current_responses = db.query(models.UserResponse).filter(models.UserResponse.AssignmentId == assignment.Id).all()
+                current_emails = {r.AssignedTo: r for r in current_responses}
+                new_emails = set(u.email for u in question.assigned_users)
+                
+                # Add new users
+                for user in question.assigned_users:
+                    if user.email not in current_emails:
+                        new_resp = models.UserResponse(
+                            AssignmentId=assignment.Id,
+                            AssignedTo=user.email,
+                            Status='Assigned',
+                            CreatedBy=goal_payload.created_by.email
+                        )
+                        db.add(new_resp)
+                
+                # Remove unassigned users
+                for email, resp in current_emails.items():
+                    if email not in new_emails:
+                        db.delete(resp)
+            
+            # Prepare response with assignments
+            final_assignments = db.query(models.Assignment).filter(models.Assignment.GoalId == goal.Id).all()
+            assignment_list = [{"Id": a.Id, "QuestionText": a.QuestionText} for a in final_assignments]
+            
             db.commit()
-            db.refresh(new_assignment)
+            return {"goal_id": goal.Id, "assignments": assignment_list}
 
-            # Assign users to assignments
-            for user in question.assigned_users:
-                new_user_response = models.UserResponse(
-                    AssignmentId=new_assignment.Id,
-                    AssignedTo=user.email,
-                    Status='Assigned',
+        else:
+            # Insert the Goal and get its ID
+            new_goal = models.Goal(
+                OrganizationId=goal_payload.organization_id,
+                Title=goal_payload.title,
+                DueDate=goal_payload.due_date,
+                GoalDescription=goal_payload.description,
+                CreatedBy=goal_payload.created_by.email,
+                DepartmentId=goal_payload.department_id
+            )
+            db.add(new_goal)
+            db.commit()
+            db.refresh(new_goal)
+            goal_id = new_goal.Id
+    
+            created_assignments = []
+
+            for idx, question in enumerate(goal_payload.questions, start=1):
+                # Create assignment entry with sequential order
+                new_assignment = models.Assignment(
+                    GoalId=goal_id,
+                    ParentAssignmentId=None,  # Assuming root-level assignments
+                    QuestionText=question.text,
+                    Order=idx,
                     CreatedBy=goal_payload.created_by.email
                 )
-                db.add(new_user_response)
-
-        db.commit()  # Commit all assignments and responses
-
-        return {"goal_id": goal_id}
+                db.add(new_assignment)
+                db.commit()
+                db.refresh(new_assignment)
+                
+                created_assignments.append({"Id": new_assignment.Id, "QuestionText": new_assignment.QuestionText})
+    
+                # Assign users to assignments
+                for user in question.assigned_users:
+                    new_user_response = models.UserResponse(
+                        AssignmentId=new_assignment.Id,
+                        AssignedTo=user.email,
+                        Status='Assigned',
+                        CreatedBy=goal_payload.created_by.email
+                    )
+                    db.add(new_user_response)
+    
+            db.commit()  # Commit all assignments and responses
+    
+            return {"goal_id": goal_id, "assignments": created_assignments}
 
     except Exception as e:
         db.rollback()
@@ -187,12 +253,41 @@ def get_goal_summary(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
 
 # Delete goal by ID
+# Delete goal by ID with cascade deletion of related data
 @router.delete("/goal/{goal_id}", response_model=schemas.Goal)
 def delete_goal(goal_id: int, db: Session = Depends(get_db)):
-    db_goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
-    if db_goal is None:
-        raise HTTPException(status_code=404, detail="Goal not found")
-    
-    db.delete(db_goal)
-    db.commit()
-    return db_goal
+    """Delete a goal and all related data (assignments and user responses)."""
+    try:
+        # First, verify the goal exists
+        db_goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
+        if db_goal is None:
+            raise HTTPException(status_code=404, detail="Goal not found")
+        
+        # Get all assignments for this goal
+        assignments = db.query(models.Assignment).filter(models.Assignment.GoalId == goal_id).all()
+        assignment_ids = [assignment.Id for assignment in assignments]
+        
+        # Delete user responses for all assignments
+        if assignment_ids:
+            db.query(models.UserResponse).filter(
+                models.UserResponse.AssignmentId.in_(assignment_ids)
+            ).delete(synchronize_session=False)
+        
+        # Delete all assignments for this goal
+        db.query(models.Assignment).filter(models.Assignment.GoalId == goal_id).delete(synchronize_session=False)
+        
+        # Store goal data before deletion for response
+        goal_data = db_goal
+        
+        # Finally, delete the goal itself
+        db.delete(db_goal)
+        
+        # Commit all changes
+        db.commit()
+        return goal_data
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error deleting goal: {str(e)}")

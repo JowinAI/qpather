@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+from datetime import datetime
 from db import models, schemas
 from api.dependencies.model_utils import get_db
 
@@ -22,15 +23,33 @@ def create_assignment(assignment: schemas.AssignmentCreate, db: Session = Depend
     db.commit()
     db.refresh(new_assignment)
     return new_assignment
-# Create multiple assignments and assign them to multiple users
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from typing import List
-from datetime import datetime
-from db import models, schemas
-from api.dependencies.model_utils import get_db
 
-router = APIRouter()
+# Create a delegated assignment and assign it to a user
+@router.post("/delegate-assignment", response_model=schemas.Assignment)
+def create_delegated_assignment(assignment: schemas.DelegatedAssignmentCreate, db: Session = Depends(get_db)):
+    # 1. Create the Assignment (Child)
+    new_assignment = models.Assignment(
+        GoalId=assignment.GoalId,
+        ParentAssignmentId=assignment.ParentAssignmentId,
+        QuestionText=assignment.QuestionText,
+        Order=1, # Default order
+        CreatedBy=assignment.CreatedBy
+    )
+    db.add(new_assignment)
+    db.commit()
+    db.refresh(new_assignment)
+
+    # 2. Create the UserResponse
+    new_user_response = models.UserResponse(
+        AssignmentId=new_assignment.Id,
+        AssignedTo=assignment.AssignedToEmail,
+        Status='Assigned',
+        CreatedBy=assignment.CreatedBy
+    )
+    db.add(new_user_response)
+    db.commit()
+    
+    return new_assignment
 
 # Create multiple assignments and assign them to multiple users
 @router.post("/assignments/bulk-with-responses", response_model=schemas.AssignmentsFirstSave)
@@ -145,3 +164,132 @@ def delete_assignment(assignment_id: int, db: Session = Depends(get_db)):
     db.delete(db_assignment)
     db.commit()
     return db_assignment
+
+# Get child assignments (delegated tasks) by parent assignment ID
+# Get child assignments (delegated tasks) by parent assignment ID
+@router.get("/assignments/{parent_assignment_id}/delegated")
+def get_delegated_assignments(parent_assignment_id: int, db: Session = Depends(get_db)):
+    # Join Assignment and UserResponse to fetch everything in one query
+    results = (
+        db.query(models.Assignment, models.UserResponse)
+        .join(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
+        .filter(models.Assignment.ParentAssignmentId == parent_assignment_id)
+        .all()
+    )
+    
+    output = []
+    for assignment, response in results:
+        output.append({
+            "assignmentId": assignment.Id,
+            "userId": response.AssignedTo,
+            "userName": response.AssignedTo, # Assuming name is same as email for now or needs another join
+            "status": response.Status,
+            "answer": response.Answer,
+            "createdAt": response.CreatedAt.isoformat() if response.CreatedAt else None,
+            "updatedAt": response.UpdatedAt.isoformat() if response.UpdatedAt else None
+        })
+    
+    return output
+
+# Delete a delegated assignment and its user responses
+@router.delete("/assignments/{assignment_id}/delegated/{user_email}")
+def delete_delegated_assignment(assignment_id: int, user_email: str, db: Session = Depends(get_db)):
+    from urllib.parse import unquote
+    user_email = unquote(user_email)
+    
+    # Find the child assignment with this parent and for this user
+    child_assignments = (
+        db.query(models.Assignment)
+        .filter(models.Assignment.ParentAssignmentId == assignment_id)
+        .all()
+    )
+    
+    deleted_count = 0
+    for assignment in child_assignments:
+        # Find user responses for this assignment and user
+        user_responses = (
+            db.query(models.UserResponse)
+            .filter(
+                models.UserResponse.AssignmentId == assignment.Id,
+                models.UserResponse.AssignedTo == user_email
+            )
+            .all()
+        )
+        
+        if user_responses:
+            # Delete user responses
+            for response in user_responses:
+                db.delete(response)
+                deleted_count += 1
+            
+            # Check if there are any other responses for this assignment
+            remaining_responses = (
+                db.query(models.UserResponse)
+                .filter(models.UserResponse.AssignmentId == assignment.Id)
+                .count()
+            )
+            
+            # If no other responses, delete the assignment too
+            if remaining_responses == 0:
+                db.delete(assignment)
+    
+    if deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Delegated assignment not found for this user")
+    
+    db.commit()
+    return {"message": f"Successfully deleted {deleted_count} delegated assignment(s)"}
+
+@router.get("/my-tasks/", response_model=List[schemas.AssignmentWithStatus])
+def get_my_tasks(user_email: str, db: Session = Depends(get_db)):
+    # 1. Fetch tasks assigned to the current user
+    results = (
+        db.query(models.Assignment, models.UserResponse.Status, models.UserResponse.Answer)
+        .join(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
+        .filter(models.UserResponse.AssignedTo == user_email)
+        .all()
+    )
+    
+    if not results:
+        return []
+
+    task_ids = [r[0].Id for r in results]
+    
+    # 2. Fetch all delegated users for these tasks in one query
+    # Find assignments where ParentAssignmentId is in our task_ids
+    # Join with UserResponse to get who they are assigned to
+    delegations = (
+        db.query(models.Assignment.ParentAssignmentId, models.UserResponse.AssignedTo)
+        .join(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
+        .filter(models.Assignment.ParentAssignmentId.in_(task_ids))
+        .all()
+    )
+    
+    # Map parent_id -> list of assigned emails
+    delegation_map = {}
+    for parent_id, assigned_email in delegations:
+        if parent_id not in delegation_map:
+            delegation_map[parent_id] = []
+        delegation_map[parent_id].append(assigned_email)
+
+    tasks = []
+    for assignment, status, answer in results:
+        # Get delegations for this task from our map
+        delegated_users = delegation_map.get(assignment.Id, [])
+        
+        task_data = schemas.AssignmentWithStatus(
+            Id=assignment.Id,
+            GoalId=assignment.GoalId,
+            ParentAssignmentId=assignment.ParentAssignmentId,
+            QuestionText=assignment.QuestionText,
+            Order=assignment.Order,
+            CreatedAt=assignment.CreatedAt,
+            UpdatedAt=assignment.UpdatedAt,
+            CreatedBy=assignment.CreatedBy,
+            UpdatedBy=assignment.UpdatedBy,
+            Status=status,
+            Answer=answer,
+            DelegatedUsers=delegated_users
+        )
+        tasks.append(task_data)
+        
+    return tasks

@@ -1,9 +1,22 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import httpx
-import os   
+import os
 
 router = APIRouter()
+
+@router.post("/analyze-goal/{goal_id}")
+async def analyze_goal(goal_id: int):
+    # In a real implementation:
+    # 1. Fetch Goal (Title, Description)
+    # 2. Fetch all Assignments and UserResponses
+    # 3. Construct prompt with all context
+    # 4. Call LLM
+    
+    # Mock Response for MVP
+    return {
+        "analysis": "Based on the responses collected so far:\n\n1. **Key Themes**: Most team members agree that 'AI Automation' and 'Real-time Analytics' are the highest impact features.\n\n2. **Concerns**: There are some concerns about the learning curve for new users regarding the advanced analytics dashboard.\n\n3. **Recommendation**: Prioritize the AI automation engine for the Q3 release, but schedule a UX research sprint for the analytics dashboard to address usability concerns."
+    }
 
 # Replace this with your actual API key or load from environment variables
 API_KEY = os.getenv("OPENAI_API_KEY", "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")
@@ -26,50 +39,57 @@ async def breakdown():
 # API route to interact with OpenAI API
 @router.post("/breakdown/")
 async def breakdown(request: ChatRequest):
-    system_message = f'''
-        You are assisting a user from the following context:
-        - Role: {person_details['role']}
-        - Company: {person_details['company']}
-        - Company Geography: {person_details['geography']}
-        
-        Please provide responses based on the user's background.
-        Provide upto 5 questions or statements.
-        The response must be in the following JSON format:
-        {{
-          "Goal": "one title line for what the user is trying to achieve",
-          "Questions": [
-            "your first question",
-            "your second question"
-          ]
-        }}
-    '''
-
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {API_KEY}",
+    # Mock response for testing/demo purposes
+    mock_response = {
+        "response": "{\n  \"Goal\": \"Strategies for increasing sales and expanding the team\",\n  \"Questions\": [\n    \"What specific sales strategies have you implemented in the past that have been successful?\",\n    \"What criteria do you consider when hiring new team members to ensure they align with the company's goals and values?\"\n  ]\n}"
     }
+    return mock_response
 
-    payload = {
-        "model": "gpt-3.5-turbo",
-        "messages": [
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": request.content}
-        ],
-        "max_tokens": 200,
-        "temperature": 0.7
-    }
-
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers)
-            response.raise_for_status()
-            result = response.json()
-            response_text = result["choices"][0]["message"]["content"]
-            return {"response": response_text}
-    except httpx.HTTPError as http_err:
-        raise HTTPException(status_code=500, detail=f"Error calling OpenAI API: {http_err}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
+    # OpenAI Logic (Commented out due to invalid/missing API Key)
+    # system_message = f'''
+    #     You are assisting a user from the following context:
+    #     - Role: {person_details['role']}
+    #     - Company: {person_details['company']}
+    #     - Company Geography: {person_details['geography']}
+    #     
+    #     Please provide responses based on the user's background.
+    #     Provide upto 5 questions or statements.
+    #     The response must be in the following JSON format:
+    #     {{
+    #       "Goal": "one title line for what the user is trying to achieve",
+    #       "Questions": [
+    #         "your first question",
+    #         "your second question"
+    #       ]
+    #     }}
+    # '''
+    #
+    # headers = {
+    #     "Content-Type": "application/json",
+    #     "Authorization": f"Bearer {API_KEY}",
+    # }
+    #
+    # payload = {
+    #     "model": "gpt-3.5-turbo",
+    #     "messages": [
+    #         {"role": "system", "content": system_message},
+    #         {"role": "user", "content": request.content}
+    #     ],
+    #     "max_tokens": 200,
+    #     "temperature": 0.7
+    # }
+    #
+    # try:
+    #     async with httpx.AsyncClient() as client:
+    #         response = await client.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers)
+    #         response.raise_for_status()
+    #         result = response.json()
+    #         response_text = result["choices"][0]["message"]["content"]
+    #         return {"response": response_text}
+    # except httpx.HTTPError as http_err:
+    #     raise HTTPException(status_code=500, detail=f"Error calling OpenAI API: {http_err}")
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
 
 
 

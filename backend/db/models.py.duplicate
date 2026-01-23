@@ -112,7 +112,6 @@ class UserResponse(Base):
     AssignmentId = Column(Integer, ForeignKey('assignment.Id'), nullable=False)
     AssignedTo = Column(String(255), nullable=False)
     Answer = Column(Text)
-    Attachments = Column(Text, nullable=True)
     Status = Column(String(50), default='Assigned')  # 'Assigned', 'Draft', 'Final'
     CreatedAt = Column(DateTime, default=func.now())
     UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())

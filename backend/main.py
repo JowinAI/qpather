@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 from db.models import Base
-from api.routes import test, analysis,aiagent, client, organization, department, goal, assignment, response, organization_settings, user_settings, user, subscription_plan, organization_subscription, billing, feature, organization_feature_access, audit_log
+from api.routes import test, analysis,aiagent, client, organization, department, goal, assignment, response, organization_settings, user_settings, user, subscription_plan, organization_subscription, billing, feature, organization_feature_access, audit_log, files
 from db.database import engine
 import uvicorn
 import os
@@ -16,7 +16,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust origins as necessary
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,6 +45,7 @@ app.include_router(billing.router, prefix="/api/v1", tags=["Billing"])
 app.include_router(feature.router, prefix="/api/v1", tags=["Feature"])
 app.include_router(organization_feature_access.router, prefix="/api/v1", tags=["OrganizationFeatureAccess"])
 app.include_router(audit_log.router, prefix="/api/v1", tags=["AuditLog"])
+app.include_router(files.router, prefix="/api/v1/files", tags=["Files"])
 
 # Health check endpoints
 @app.get("/", status_code=status.HTTP_200_OK, tags=["Health"])
