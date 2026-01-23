@@ -13,21 +13,7 @@ SQL_COPT_SS_ACCESS_TOKEN = 1256  # Connection option for access tokens, as defin
 TOKEN_URL = "https://database.windows.net/"  # The token URL for any Azure SQL database
 
 #connection_string = "mssql+pyodbc://sqladmin:Molutty240$@qpather-qa-sql.database.windows.net:1433/qpather-qa?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
-# Check for Azure environment variables first
-db_server = os.environ.get("DB_SERVER")
-db_user = os.environ.get("DB_USER")
-db_password = os.environ.get("DB_PSW")
-db_name = os.environ.get("DB_NAME")
-
-if db_server and db_user and db_password and db_name:
-    # Use Azure configuration
-    from urllib.parse import quote_plus
-    encoded_user = quote_plus(db_user)
-    encoded_password = quote_plus(db_password)
-    connection_string = f"mssql+pyodbc://{encoded_user}:{encoded_password}@{db_server}:1433/{db_name}?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
-else:
-    # Fallback to hardcoded development database
-    connection_string = "mssql+pyodbc://db_aa36ea_qpather_admin:Nijesh2024@SQL5112.site4now.net:1433/db_aa36ea_qpather?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
+connection_string = "mssql+pyodbc://db_aa36ea_qpather_admin:Nijesh2024@SQL5112.site4now.net:1433/db_aa36ea_qpather?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=no"
 print(f"Connection string: {connection_string}")
 engine = create_engine(connection_string)  # , echo=True)  # echo=True for debugging sqlalchemy queries
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
