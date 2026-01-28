@@ -42,7 +42,7 @@ def create_user_response(user_response: schemas.UserResponseCreate, db: Session 
         return new_user_response
 
 # Get user response by Assignment ID and User Email
-@router.get("/user-responses/assignment/{assignment_id}", response_model=schemas.UserResponse)
+@router.get("/user-responses/assignment/{assignment_id}", response_model=List[schemas.UserResponse])
 def get_my_response(assignment_id: int, user_email: str, db: Session = Depends(get_db)):
     user_response = db.query(models.UserResponse)\
         .filter(models.UserResponse.AssignmentId == assignment_id)\
@@ -50,11 +50,10 @@ def get_my_response(assignment_id: int, user_email: str, db: Session = Depends(g
         .first()
         
     if user_response is None:
-        # Return a shell response or 404. 
-        # Since the frontend might expect 404 to just mean "no response yet", 404 is fine.
-        raise HTTPException(status_code=404, detail="User response not found")
+        # Return empty list if no response found (instead of 404)
+        return []
         
-    return user_response
+    return [user_response]
 
 # Get user response by ID
 @router.get("/user-responses/{response_id}", response_model=schemas.UserResponse)

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 from db.models import Base
-from api.routes import auth, analysis,aiagent, client, organization, department, goal, assignment, response, organization_settings, user_settings, user, subscription_plan, organization_subscription, billing, feature, organization_feature_access, audit_log, files, invitation
+from api.routes import test, analysis,aiagent, client, organization, department, goal, assignment, response, organization_settings, user_settings, user, subscription_plan, organization_subscription, billing, feature, organization_feature_access, audit_log, files
 from db.database import engine
 import uvicorn
 import os
@@ -16,7 +16,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,7 +29,6 @@ logging.info("CORS is completely disabled. All origins, methods, and headers are
 
 # Include routers
 #app.include_router(aiagent.router, prefix="/api/v1", tags=["AIAgent"])
-app.include_router(auth.router, prefix="/api/v1", tags=["Auth"])
 app.include_router(analysis.router, prefix="/api/v1", tags=["Analysis"])
 app.include_router(client.router, prefix="/api/v1", tags=["Client"])
 app.include_router(organization.router, prefix="/api/v1", tags=["Organization"])
@@ -46,10 +45,6 @@ app.include_router(billing.router, prefix="/api/v1", tags=["Billing"])
 app.include_router(feature.router, prefix="/api/v1", tags=["Feature"])
 app.include_router(organization_feature_access.router, prefix="/api/v1", tags=["OrganizationFeatureAccess"])
 app.include_router(audit_log.router, prefix="/api/v1", tags=["AuditLog"])
-from api.routes import notifications_email
-app.include_router(notifications_email.router, prefix="/api/v1/email", tags=["EmailNotifications"])
-app.include_router(files.router, prefix="/api/v1/files", tags=["Files"])
-app.include_router(invitation.router, prefix="/api/v1", tags=["Invitation"])
 
 # Health check endpoints
 @app.get("/", status_code=status.HTTP_200_OK, tags=["Health"])

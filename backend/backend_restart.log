@@ -1,0 +1,737 @@
+[2026-01-27 16:34:43 -0500] [78797] [INFO] Starting gunicorn 21.2.0
+[2026-01-27 16:34:43 -0500] [78797] [INFO] Listening at: http://127.0.0.1:8000 (78797)
+[2026-01-27 16:34:43 -0500] [78797] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2026-01-27 16:34:43 -0500] [78802] [INFO] Booting worker with pid: 78802
+[2026-01-27 16:34:43 -0500] [78803] [INFO] Booting worker with pid: 78803
+[2026-01-27 16:34:43 -0500] [78804] [INFO] Booting worker with pid: 78804
+[2026-01-27 16:34:43 -0500] [78805] [INFO] Booting worker with pid: 78805
+[2026-01-27 16:34:44 -0500] [78804] [INFO] Started server process [78804]
+[2026-01-27 16:34:44 -0500] [78802] [INFO] Started server process [78802]
+[2026-01-27 16:34:44 -0500] [78803] [INFO] Started server process [78803]
+[2026-01-27 16:34:44 -0500] [78804] [INFO] Waiting for application startup.
+[2026-01-27 16:34:44 -0500] [78803] [INFO] Waiting for application startup.
+[2026-01-27 16:34:44 -0500] [78802] [INFO] Waiting for application startup.
+[2026-01-27 16:34:44 -0500] [78804] [INFO] Application startup complete.
+[2026-01-27 16:34:44 -0500] [78803] [INFO] Application startup complete.
+[2026-01-27 16:34:44 -0500] [78802] [INFO] Application startup complete.
+[2026-01-27 16:34:44 -0500] [78805] [INFO] Started server process [78805]
+[2026-01-27 16:34:44 -0500] [78805] [INFO] Waiting for application startup.
+[2026-01-27 16:34:44 -0500] [78805] [INFO] Application startup complete.
+/Users/joisejoy/Documents/jowinai/qpather/backend/api/routes/goal.py:273: SAWarning: Coercing Subquery object into a select() for use in IN(); please pass a select() construct explicitly
+  (models.Goal.Id.in_(assigned_goals_subquery))
+/Users/joisejoy/Documents/jowinai/qpather/backend/api/routes/goal.py:273: SAWarning: Coercing Subquery object into a select() for use in IN(); please pass a select() construct explicitly
+  (models.Goal.Id.in_(assigned_goals_subquery))
+/Users/joisejoy/Documents/jowinai/qpather/backend/api/routes/goal.py:273: SAWarning: Coercing Subquery object into a select() for use in IN(); please pass a select() construct explicitly
+  (models.Goal.Id.in_(assigned_goals_subquery))
+/Users/joisejoy/Documents/jowinai/qpather/backend/api/routes/goal.py:273: SAWarning: Coercing Subquery object into a select() for use in IN(); please pass a select() construct explicitly
+  (models.Goal.Id.in_(assigned_goals_subquery))
+[2026-01-27 21:21:20 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:78802)
+[2026-01-27 21:21:21 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:78805)
+[2026-01-27 21:21:21 -0500] [78797] [ERROR] Worker (pid:78802) was sent SIGABRT!
+[2026-01-27 21:21:21 -0500] [9176] [INFO] Booting worker with pid: 9176
+[2026-01-27 21:21:21 -0500] [78804] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+pyodbc.OperationalError: ('08S01', '[08S01] [Microsoft][ODBC Driver 18 for SQL Server]TCP Provider: Error code 0x274C (10060) (SQLExecDirectW)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/uvicorn/protocols/http/h11_impl.py", line 406, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/concurrency.py", line 39, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2441, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 943, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/api/routes/goal.py", line 178, in get_goal_details
+    goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2728, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2827, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2362, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2247, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (pyodbc.OperationalError) ('08S01', '[08S01] [Microsoft][ODBC Driver 18 for SQL Server]TCP Provider: Error code 0x274C (10060) (SQLExecDirectW)')
+[SQL: SELECT TOP 1 goal.[Id] AS [goal_Id], goal.[OrganizationId] AS [goal_OrganizationId], goal.[Title] AS [goal_Title], goal.[ThreadId] AS [goal_ThreadId], goal.[DueDate] AS [goal_DueDate], goal.[InitiatedBy] AS [goal_InitiatedBy], goal.[GoalDescription] AS [goal_GoalDescription], goal.[CreatedAt] AS [goal_CreatedAt], goal.[UpdatedAt] AS [goal_UpdatedAt], goal.[CreatedBy] AS [goal_CreatedBy], goal.[UpdatedBy] AS [goal_UpdatedBy], goal.[DepartmentId] AS [goal_DepartmentId] 
+FROM goal 
+WHERE goal.[Id] = ?]
+[parameters: (161,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[2026-01-27 21:21:21 -0500] [78797] [ERROR] Worker (pid:78805) was sent SIGABRT!
+[2026-01-27 21:21:21 -0500] [9177] [INFO] Booting worker with pid: 9177
+[2026-01-27 21:21:22 -0500] [9177] [INFO] Started server process [9177]
+[2026-01-27 21:21:22 -0500] [9176] [INFO] Started server process [9176]
+[2026-01-27 21:21:22 -0500] [9177] [INFO] Waiting for application startup.
+[2026-01-27 21:21:22 -0500] [9176] [INFO] Waiting for application startup.
+[2026-01-27 21:21:22 -0500] [9176] [INFO] Application startup complete.
+[2026-01-27 21:21:22 -0500] [9177] [INFO] Application startup complete.
+[2026-01-27 21:46:10 -0500] [78803] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+pyodbc.OperationalError: ('08S01', '[08S01] [Microsoft][ODBC Driver 18 for SQL Server]TCP Provider: Error code 0x274C (10060) (SQLExecDirectW)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/uvicorn/protocols/http/h11_impl.py", line 406, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/concurrency.py", line 39, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2441, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 943, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/api/routes/goal.py", line 178, in get_goal_details
+    goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2728, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2827, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2362, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2247, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (pyodbc.OperationalError) ('08S01', '[08S01] [Microsoft][ODBC Driver 18 for SQL Server]TCP Provider: Error code 0x274C (10060) (SQLExecDirectW)')
+[SQL: SELECT TOP 1 goal.[Id] AS [goal_Id], goal.[OrganizationId] AS [goal_OrganizationId], goal.[Title] AS [goal_Title], goal.[ThreadId] AS [goal_ThreadId], goal.[DueDate] AS [goal_DueDate], goal.[InitiatedBy] AS [goal_InitiatedBy], goal.[GoalDescription] AS [goal_GoalDescription], goal.[CreatedAt] AS [goal_CreatedAt], goal.[UpdatedAt] AS [goal_UpdatedAt], goal.[CreatedBy] AS [goal_CreatedBy], goal.[UpdatedBy] AS [goal_UpdatedBy], goal.[DepartmentId] AS [goal_DepartmentId] 
+FROM goal 
+WHERE goal.[Id] = ?]
+[parameters: (161,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[2026-01-27 21:46:10 -0500] [78803] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+pyodbc.OperationalError: ('08S01', '[08S01] [Microsoft][ODBC Driver 18 for SQL Server]TCP Provider: Error code 0x274C (10060) (SQLExecDirectW)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/uvicorn/protocols/http/h11_impl.py", line 406, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/concurrency.py", line 39, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2441, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 943, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/api/routes/assignment.py", line 273, in get_my_tasks
+    .filter(func.lower(models.UserResponse.AssignedTo) == user_email.lower())
+     ^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2673, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2827, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2362, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2247, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (pyodbc.OperationalError) ('08S01', '[08S01] [Microsoft][ODBC Driver 18 for SQL Server]TCP Provider: Error code 0x274C (10060) (SQLExecDirectW)')
+[SQL: SELECT assignment.[Id] AS [assignment_Id], assignment.[GoalId] AS [assignment_GoalId], assignment.[ThreadId] AS [assignment_ThreadId], assignment.[ParentAssignmentId] AS [assignment_ParentAssignmentId], assignment.[QuestionText] AS [assignment_QuestionText], assignment.[Order] AS [assignment_Order], assignment.[CreatedAt] AS [assignment_CreatedAt], assignment.[UpdatedAt] AS [assignment_UpdatedAt], assignment.[CreatedBy] AS [assignment_CreatedBy], assignment.[UpdatedBy] AS [assignment_UpdatedBy], userresponse.[Status] AS [userresponse_Status], userresponse.[Answer] AS [userresponse_Answer] 
+FROM assignment JOIN userresponse ON assignment.[Id] = userresponse.[AssignmentId] 
+WHERE userresponse.[AssignedTo] = ?]
+[parameters: ('joise.alvin@gmail.com',)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[2026-01-27 21:46:10 -0500] [78803] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+pyodbc.OperationalError: ('08S01', '[08S01] [Microsoft][ODBC Driver 18 for SQL Server]TCP Provider: Error code 0x274C (10060) (SQLExecDirectW)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/uvicorn/protocols/http/h11_impl.py", line 406, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/concurrency.py", line 39, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2441, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 943, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/api/routes/assignment.py", line 273, in get_my_tasks
+    .filter(func.lower(models.UserResponse.AssignedTo) == user_email.lower())
+     ^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2673, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2827, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2362, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2247, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (pyodbc.OperationalError) ('08S01', '[08S01] [Microsoft][ODBC Driver 18 for SQL Server]TCP Provider: Error code 0x274C (10060) (SQLExecDirectW)')
+[SQL: SELECT assignment.[Id] AS [assignment_Id], assignment.[GoalId] AS [assignment_GoalId], assignment.[ThreadId] AS [assignment_ThreadId], assignment.[ParentAssignmentId] AS [assignment_ParentAssignmentId], assignment.[QuestionText] AS [assignment_QuestionText], assignment.[Order] AS [assignment_Order], assignment.[CreatedAt] AS [assignment_CreatedAt], assignment.[UpdatedAt] AS [assignment_UpdatedAt], assignment.[CreatedBy] AS [assignment_CreatedBy], assignment.[UpdatedBy] AS [assignment_UpdatedBy], userresponse.[Status] AS [userresponse_Status], userresponse.[Answer] AS [userresponse_Answer] 
+FROM assignment JOIN userresponse ON assignment.[Id] = userresponse.[AssignmentId] 
+WHERE userresponse.[AssignedTo] = ?]
+[parameters: ('joise.alvin@gmail.com',)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[2026-01-27 21:46:12 -0500] [78804] [ERROR] Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+pyodbc.OperationalError: ('08S01', '[08S01] [Microsoft][ODBC Driver 18 for SQL Server]TCP Provider: Error code 0x41 (65) (SQLExecDirectW)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/uvicorn/protocols/http/h11_impl.py", line 406, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 62, in wrapped_app
+    raise exc
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 51, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/starlette/concurrency.py", line 39, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2441, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 943, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/api/routes/goal.py", line 178, in get_goal_details
+    goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2728, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2827, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2362, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2247, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/joisejoy/Documents/jowinai/qpather/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (pyodbc.OperationalError) ('08S01', '[08S01] [Microsoft][ODBC Driver 18 for SQL Server]TCP Provider: Error code 0x41 (65) (SQLExecDirectW)')
+[SQL: SELECT TOP 1 goal.[Id] AS [goal_Id], goal.[OrganizationId] AS [goal_OrganizationId], goal.[Title] AS [goal_Title], goal.[ThreadId] AS [goal_ThreadId], goal.[DueDate] AS [goal_DueDate], goal.[InitiatedBy] AS [goal_InitiatedBy], goal.[GoalDescription] AS [goal_GoalDescription], goal.[CreatedAt] AS [goal_CreatedAt], goal.[UpdatedAt] AS [goal_UpdatedAt], goal.[CreatedBy] AS [goal_CreatedBy], goal.[UpdatedBy] AS [goal_UpdatedBy], goal.[DepartmentId] AS [goal_DepartmentId] 
+FROM goal 
+WHERE goal.[Id] = ?]
+[parameters: (161,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[2026-01-27 22:47:10 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:78803)
+[2026-01-27 22:47:10 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:78804)
+[2026-01-27 22:47:10 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:9176)
+[2026-01-27 22:47:10 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:9177)
+[2026-01-27 22:47:10 -0500] [78797] [ERROR] Worker (pid:78803) was sent SIGABRT!
+[2026-01-27 22:47:10 -0500] [9739] [INFO] Booting worker with pid: 9739
+[2026-01-27 22:47:10 -0500] [78797] [ERROR] Worker (pid:78804) was sent SIGABRT!
+[2026-01-27 22:47:11 -0500] [9741] [INFO] Booting worker with pid: 9741
+[2026-01-27 22:47:12 -0500] [78797] [ERROR] Worker (pid:9176) was sent SIGABRT!
+[2026-01-27 22:47:12 -0500] [9746] [INFO] Booting worker with pid: 9746
+[2026-01-27 22:47:12 -0500] [78797] [ERROR] Worker (pid:9177) was sent SIGABRT!
+[2026-01-27 22:47:13 -0500] [9767] [INFO] Booting worker with pid: 9767
+[2026-01-27 22:47:17 -0500] [9746] [INFO] Started server process [9746]
+[2026-01-27 22:47:17 -0500] [9741] [INFO] Started server process [9741]
+[2026-01-27 22:47:17 -0500] [9767] [INFO] Started server process [9767]
+[2026-01-27 22:47:17 -0500] [9739] [INFO] Started server process [9739]
+[2026-01-27 22:47:17 -0500] [9741] [INFO] Waiting for application startup.
+[2026-01-27 22:47:17 -0500] [9739] [INFO] Waiting for application startup.
+[2026-01-27 22:47:17 -0500] [9746] [INFO] Waiting for application startup.
+[2026-01-27 22:47:17 -0500] [9767] [INFO] Waiting for application startup.
+[2026-01-27 22:47:17 -0500] [9741] [INFO] Application startup complete.
+[2026-01-27 22:47:17 -0500] [9739] [INFO] Application startup complete.
+[2026-01-27 22:47:17 -0500] [9767] [INFO] Application startup complete.
+[2026-01-27 22:47:17 -0500] [9746] [INFO] Application startup complete.
+[2026-01-27 23:48:11 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:9767)
+[2026-01-27 23:48:12 -0500] [78797] [ERROR] Worker (pid:9767) was sent SIGABRT!
+[2026-01-27 23:48:12 -0500] [9919] [INFO] Booting worker with pid: 9919
+[2026-01-27 23:48:28 -0500] [9919] [INFO] Started server process [9919]
+[2026-01-27 23:48:28 -0500] [9919] [INFO] Waiting for application startup.
+[2026-01-27 23:48:28 -0500] [9919] [INFO] Application startup complete.
+[2026-01-28 00:49:12 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:9739)
+[2026-01-28 00:49:13 -0500] [78797] [ERROR] Worker (pid:9739) was sent SIGABRT!
+[2026-01-28 00:49:13 -0500] [10139] [INFO] Booting worker with pid: 10139
+[2026-01-28 00:49:14 -0500] [10139] [INFO] Started server process [10139]
+[2026-01-28 00:49:14 -0500] [10139] [INFO] Waiting for application startup.
+[2026-01-28 00:49:14 -0500] [10139] [INFO] Application startup complete.
+[2026-01-28 02:25:46 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:9746)
+[2026-01-28 02:25:47 -0500] [78797] [ERROR] Worker (pid:9746) was sent SIGABRT!
+[2026-01-28 02:25:47 -0500] [10487] [INFO] Booting worker with pid: 10487
+[2026-01-28 02:26:08 -0500] [10487] [INFO] Started server process [10487]
+[2026-01-28 02:26:08 -0500] [10487] [INFO] Waiting for application startup.
+[2026-01-28 02:26:08 -0500] [10487] [INFO] Application startup complete.
+[2026-01-28 02:35:47 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:9741)
+[2026-01-28 02:35:47 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:10139)
+[2026-01-28 02:35:47 -0500] [78797] [ERROR] Worker (pid:9741) was sent SIGABRT!
+[2026-01-28 02:35:47 -0500] [10763] [INFO] Booting worker with pid: 10763
+[2026-01-28 02:35:47 -0500] [78797] [ERROR] Worker (pid:10139) was sent SIGABRT!
+[2026-01-28 02:35:47 -0500] [10764] [INFO] Booting worker with pid: 10764
+[2026-01-28 02:35:49 -0500] [10763] [INFO] Started server process [10763]
+[2026-01-28 02:35:49 -0500] [10764] [INFO] Started server process [10764]
+[2026-01-28 02:35:49 -0500] [10763] [INFO] Waiting for application startup.
+[2026-01-28 02:35:49 -0500] [10764] [INFO] Waiting for application startup.
+[2026-01-28 02:35:49 -0500] [10763] [INFO] Application startup complete.
+[2026-01-28 02:35:49 -0500] [10764] [INFO] Application startup complete.
+[2026-01-28 04:12:48 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:9919)
+[2026-01-28 04:12:48 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:10487)
+[2026-01-28 04:12:48 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:10763)
+[2026-01-28 04:12:48 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:10764)
+[2026-01-28 04:12:49 -0500] [78797] [ERROR] Worker (pid:9919) was sent SIGABRT!
+[2026-01-28 04:12:49 -0500] [11237] [INFO] Booting worker with pid: 11237
+[2026-01-28 04:12:50 -0500] [78797] [ERROR] Worker (pid:10487) was sent SIGABRT!
+[2026-01-28 04:12:50 -0500] [78797] [ERROR] Worker (pid:10763) was sent SIGABRT!
+[2026-01-28 04:12:50 -0500] [11245] [INFO] Booting worker with pid: 11245
+[2026-01-28 04:12:50 -0500] [11247] [INFO] Booting worker with pid: 11247
+[2026-01-28 04:12:50 -0500] [78797] [ERROR] Worker (pid:10764) was sent SIGABRT!
+[2026-01-28 04:12:50 -0500] [11248] [INFO] Booting worker with pid: 11248
+[2026-01-28 04:12:52 -0500] [11248] [INFO] Started server process [11248]
+[2026-01-28 04:12:52 -0500] [11248] [INFO] Waiting for application startup.
+[2026-01-28 04:12:52 -0500] [11245] [INFO] Started server process [11245]
+[2026-01-28 04:12:52 -0500] [11245] [INFO] Waiting for application startup.
+[2026-01-28 04:12:52 -0500] [11248] [INFO] Application startup complete.
+[2026-01-28 04:12:52 -0500] [11245] [INFO] Application startup complete.
+[2026-01-28 04:12:52 -0500] [11237] [INFO] Started server process [11237]
+[2026-01-28 04:12:52 -0500] [11237] [INFO] Waiting for application startup.
+[2026-01-28 04:12:52 -0500] [11237] [INFO] Application startup complete.
+[2026-01-28 04:12:52 -0500] [11247] [INFO] Started server process [11247]
+[2026-01-28 04:12:52 -0500] [11247] [INFO] Waiting for application startup.
+[2026-01-28 04:12:52 -0500] [11247] [INFO] Application startup complete.
+[2026-01-28 04:45:37 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:11237)
+[2026-01-28 04:45:37 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:11245)
+[2026-01-28 04:45:37 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:11247)
+[2026-01-28 04:45:37 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:11248)
+[2026-01-28 04:45:37 -0500] [78797] [ERROR] Worker (pid:11237) was sent SIGABRT!
+[2026-01-28 04:45:37 -0500] [11515] [INFO] Booting worker with pid: 11515
+[2026-01-28 04:45:37 -0500] [78797] [ERROR] Worker (pid:11247) was sent SIGABRT!
+[2026-01-28 04:45:37 -0500] [11518] [INFO] Booting worker with pid: 11518
+[2026-01-28 04:45:38 -0500] [78797] [ERROR] Worker (pid:11245) was sent SIGABRT!
+[2026-01-28 04:45:38 -0500] [11519] [INFO] Booting worker with pid: 11519
+[2026-01-28 04:45:38 -0500] [78797] [ERROR] Worker (pid:11248) was sent SIGABRT!
+[2026-01-28 04:45:38 -0500] [11520] [INFO] Booting worker with pid: 11520
+[2026-01-28 04:45:40 -0500] [11515] [INFO] Started server process [11515]
+[2026-01-28 04:45:40 -0500] [11515] [INFO] Waiting for application startup.
+[2026-01-28 04:45:40 -0500] [11518] [INFO] Started server process [11518]
+[2026-01-28 04:45:40 -0500] [11518] [INFO] Waiting for application startup.
+[2026-01-28 04:45:40 -0500] [11515] [INFO] Application startup complete.
+[2026-01-28 04:45:40 -0500] [11518] [INFO] Application startup complete.
+[2026-01-28 04:45:40 -0500] [11519] [INFO] Started server process [11519]
+[2026-01-28 04:45:40 -0500] [11519] [INFO] Waiting for application startup.
+[2026-01-28 04:45:40 -0500] [11519] [INFO] Application startup complete.
+[2026-01-28 04:45:40 -0500] [11520] [INFO] Started server process [11520]
+[2026-01-28 04:45:40 -0500] [11520] [INFO] Waiting for application startup.
+[2026-01-28 04:45:40 -0500] [11520] [INFO] Application startup complete.
+[2026-01-28 06:22:57 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:11515)
+[2026-01-28 06:22:58 -0500] [78797] [ERROR] Worker (pid:11515) was sent SIGABRT!
+[2026-01-28 06:22:58 -0500] [12180] [INFO] Booting worker with pid: 12180
+[2026-01-28 06:23:00 -0500] [12180] [INFO] Started server process [12180]
+[2026-01-28 06:23:00 -0500] [12180] [INFO] Waiting for application startup.
+[2026-01-28 06:23:00 -0500] [12180] [INFO] Application startup complete.
+[2026-01-28 06:46:38 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:12180)
+[2026-01-28 06:46:38 -0500] [78797] [ERROR] Worker (pid:12180) was sent SIGABRT!
+[2026-01-28 06:46:38 -0500] [12511] [INFO] Booting worker with pid: 12511
+[2026-01-28 06:46:40 -0500] [12511] [INFO] Started server process [12511]
+[2026-01-28 06:46:40 -0500] [12511] [INFO] Waiting for application startup.
+[2026-01-28 06:46:40 -0500] [12511] [INFO] Application startup complete.
+[2026-01-28 06:48:06 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:11518)
+[2026-01-28 06:48:06 -0500] [78797] [CRITICAL] WORKER TIMEOUT (pid:11520)
+[2026-01-28 06:48:07 -0500] [78797] [ERROR] Worker (pid:11518) was sent SIGABRT!
+[2026-01-28 06:48:07 -0500] [12804] [INFO] Booting worker with pid: 12804
+[2026-01-28 06:48:08 -0500] [78797] [ERROR] Worker (pid:11520) was sent SIGABRT!
+[2026-01-28 06:48:08 -0500] [12826] [INFO] Booting worker with pid: 12826
+[2026-01-28 06:48:09 -0500] [12804] [INFO] Started server process [12804]
+[2026-01-28 06:48:09 -0500] [12804] [INFO] Waiting for application startup.
+[2026-01-28 06:48:09 -0500] [12804] [INFO] Application startup complete.
+[2026-01-28 06:48:09 -0500] [12826] [INFO] Started server process [12826]
+[2026-01-28 06:48:09 -0500] [12826] [INFO] Waiting for application startup.
+[2026-01-28 06:48:09 -0500] [12826] [INFO] Application startup complete.
+[2026-01-28 07:39:51 -0500] [78797] [INFO] Handling signal: term
+[2026-01-28 07:39:51 -0500] [12826] [INFO] Shutting down
+[2026-01-28 07:39:51 -0500] [12804] [INFO] Shutting down
+[2026-01-28 07:39:51 -0500] [11519] [INFO] Shutting down
+[2026-01-28 07:39:51 -0500] [12511] [INFO] Shutting down
+[2026-01-28 07:39:51 -0500] [12826] [INFO] Waiting for application shutdown.
+[2026-01-28 07:39:51 -0500] [12804] [INFO] Waiting for application shutdown.
+[2026-01-28 07:39:51 -0500] [12826] [INFO] Application shutdown complete.
+[2026-01-28 07:39:51 -0500] [12826] [INFO] Finished server process [12826]
+[2026-01-28 07:39:51 -0500] [11519] [INFO] Waiting for application shutdown.
+[2026-01-28 07:39:51 -0500] [12804] [INFO] Application shutdown complete.
+[2026-01-28 07:39:51 -0500] [12804] [INFO] Finished server process [12804]
+[2026-01-28 07:39:52 -0500] [78797] [ERROR] Worker (pid:12826) was sent SIGTERM!
+[2026-01-28 07:39:52 -0500] [78797] [ERROR] Worker (pid:12804) was sent SIGTERM!
+[2026-01-28 07:39:52 -0500] [12511] [INFO] Waiting for application shutdown.
+[2026-01-28 07:39:52 -0500] [11519] [INFO] Application shutdown complete.
+[2026-01-28 07:39:52 -0500] [11519] [INFO] Finished server process [11519]
+[2026-01-28 07:39:52 -0500] [12511] [INFO] Application shutdown complete.
+[2026-01-28 07:39:52 -0500] [12511] [INFO] Finished server process [12511]
+[2026-01-28 07:39:52 -0500] [78797] [ERROR] Worker (pid:11519) was sent SIGTERM!
+[2026-01-28 07:39:52 -0500] [78797] [ERROR] Worker (pid:12511) was sent SIGTERM!
+[2026-01-28 07:39:52 -0500] [78797] [INFO] Shutting down: Master
