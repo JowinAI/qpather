@@ -8,6 +8,18 @@ class ClientBase(BaseModel):
     ContactEmail: Optional[EmailStr] = None
     ContactPhone: Optional[str] = None
     Address: Optional[str] = None
+    Status: Optional[str] = 'Active'
+    AutoApprove: Optional[bool] = False
+    AllowedDomains: Optional[str] = None
+    WebsiteUrl: Optional[str] = None
+    CompanySummary: Optional[str] = None
+    Industry: Optional[str] = None
+    PrimaryGoals: Optional[str] = None
+    Notes: Optional[str] = None
+    LogoUrl: Optional[str] = None
+    PrimaryColor: Optional[str] = None
+    SecondaryColor: Optional[str] = None
+    DisplayNameShort: Optional[str] = None
 
 class ClientCreate(ClientBase):
     pass
@@ -19,11 +31,11 @@ class Client(ClientBase):
     Id: int
     CreatedAt: datetime
     UpdatedAt: Optional[datetime]
-    CreatedBy: str
+    CreatedBy: Optional[str]
     UpdatedBy: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Organization Schema
@@ -44,11 +56,11 @@ class Organization(OrganizationBase):
     Id: int
     CreatedAt: datetime
     UpdatedAt: Optional[datetime]
-    CreatedBy: str
+    CreatedBy: Optional[str]
     UpdatedBy: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Department Schema
@@ -67,11 +79,11 @@ class Department(DepartmentBase):
     Id: int
     CreatedAt: datetime
     UpdatedAt: Optional[datetime]
-    CreatedBy: str
+    CreatedBy: Optional[str]
     UpdatedBy: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # User Schema
@@ -82,6 +94,9 @@ class UserBase(BaseModel):
     LastName: Optional[str] = None
     Email: EmailStr
     Role: Optional[str] = None
+    Bio: Optional[str] = None
+    DecisionStyle: Optional[str] = None
+    Status: Optional[str] = 'PENDING_APPROVAL'
 
 class UserCreate(UserBase):
     CreatedBy: str
@@ -91,13 +106,16 @@ class UserUpdate(UserBase):
 
 class User(UserBase):
     Id: int
+    Status: Optional[str] = 'ACTIVE'
     CreatedAt: datetime
     UpdatedAt: Optional[datetime]
-    CreatedBy: str
+    CreatedBy: Optional[str]
     UpdatedBy: Optional[str]
+    OrganizationName: Optional[str] = None
+    DepartmentName: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Goal Schema (DueDate instead of Date)
@@ -128,10 +146,10 @@ class Goal(BaseModel):
     DepartmentId: Optional[int]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Assignment Schema
@@ -144,6 +162,7 @@ class AssignmentBase(BaseModel):
 class AssignmentCreate(AssignmentBase):
     CreatedBy: str
     CreatedAt: Optional[datetime] = None
+    ThreadId: Optional[str] = None
 
 class AssignmentUpdate(AssignmentBase):
     UpdatedBy: Optional[str] = None
@@ -156,10 +175,16 @@ class Assignment(AssignmentBase):
     UpdatedAt: Optional[datetime]
     CreatedBy: str
     UpdatedBy: Optional[str]
+    ThreadId: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
+class InviteeDetail(BaseModel):
+    Email: EmailStr
+    FirstName: str
+    LastName: str
+    Role: Optional[str] = None
     
 class AssignmentWithUsers(BaseModel):
     Id: Optional[int] = None
@@ -173,6 +198,8 @@ class AssignmentWithUsers(BaseModel):
     CreatedBy: str
     UpdatedBy: Optional[str] = None
     AssignedUsers: List[str]  = None# List of assigned users
+    Invitees: List[InviteeDetail] = [] # List of new invitees
+    ThreadId: Optional[str] = None
    
 class AssignmentsFirstSave(BaseModel):
     Assignments:List[AssignmentWithUsers] 
@@ -206,9 +233,10 @@ class UserResponse(UserResponseBase):
     UpdatedAt: Optional[datetime]
     CreatedBy: str
     UpdatedBy: Optional[str]
+    ThreadId: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # OrganizationSettings Schema
@@ -233,7 +261,7 @@ class OrganizationSettings(OrganizationSettingsBase):
     UpdatedBy: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # UserSettings Schema
@@ -263,7 +291,7 @@ class UserSettings(UserSettingsBase):
     UpdatedBy: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # SubscriptionPlan Schema
@@ -286,7 +314,7 @@ class SubscriptionPlan(SubscriptionPlanBase):
     UpdatedBy: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # OrganizationSubscription Schema
@@ -307,7 +335,7 @@ class OrganizationSubscription(OrganizationSubscriptionBase):
     UpdatedBy: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Billing Schema
@@ -333,7 +361,7 @@ class Billing(BillingBase):
     UpdatedBy: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Feature Schema
@@ -355,7 +383,7 @@ class Feature(FeatureBase):
     UpdatedBy: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # OrganizationFeatureAccess Schema
@@ -377,7 +405,7 @@ class OrganizationFeatureAccess(OrganizationFeatureAccessBase):
     UpdatedBy: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # AuditLog Schema
@@ -394,12 +422,12 @@ class AuditLog(AuditLogBase):
     Timestamp: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema for user details used in assignments
 class AssignmentUser(BaseModel):
-    id: int
+    id: str | int  # Allow string IDs for new/temp users
     name: str
     email: EmailStr
 
@@ -425,14 +453,16 @@ class GoalResponse(BaseModel):
     Assignments: List[AssignmentWithUsers]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 class UserResponseDetail(BaseModel):
     AssignedTo: str
+    Name: Optional[str] = None
     Answer: Optional[str] = None
     Attachments: Optional[str] = None
     Status: str
     CreatedAt: datetime
     UpdatedAt: Optional[datetime]
+    ThreadId: Optional[str] = None
 
 
 class AssignmentDetails(BaseModel):
@@ -444,6 +474,7 @@ class AssignmentDetails(BaseModel):
     UpdatedAt: Optional[datetime]
     CreatedBy: str
     UpdatedBy: Optional[str]
+    ThreadId: Optional[str] = None
     UserResponses: List[UserResponseDetail]
 
 class GoalDetailsResponse(BaseModel):
@@ -455,6 +486,7 @@ class GoalDetailsResponse(BaseModel):
     UpdatedAt: Optional[datetime]
     CreatedBy: str
     UpdatedBy: Optional[str]
+    ThreadId: Optional[str] = None
     Assignments: List[AssignmentDetails]
 
 
@@ -464,10 +496,11 @@ class GoalSummary(BaseModel):
     DueDate: str  # Formatted as string to display properly
     Status: str
     AssignedUsers: List[str]  # List of assigned user emails
+    CreatedBy: str  # Creator's email
     ViewLink: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class PaginatedGoalSummary(BaseModel):
     total: int
@@ -486,3 +519,26 @@ class DelegatedAssignmentCreate(BaseModel):
     QuestionText: str
     AssignedToEmail: EmailStr
     CreatedBy: str
+
+# Invitation Schema
+class InvitationBase(BaseModel):
+    Email: EmailStr
+    Token: str
+    FirstName: Optional[str] = None
+    LastName: Optional[str] = None
+    Role: Optional[str] = None
+    GoalId: int
+    QuestionText: str
+    ExpiresAt: datetime
+    Used: bool = False
+
+class InvitationCreate(InvitationBase):
+    CreatedBy: str
+
+class Invitation(InvitationBase):
+    Id: int
+    CreatedAt: datetime
+    CreatedBy: str
+    
+    class Config:
+        from_attributes = True

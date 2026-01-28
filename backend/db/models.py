@@ -14,6 +14,18 @@ class Client(Base):
     ContactEmail = Column(String(255))
     ContactPhone = Column(String(50))
     Address = Column(String(255))
+    Status = Column(String(50), default='Active')
+    AutoApprove = Column(Boolean, default=False)
+    AllowedDomains = Column(Text, nullable=True) # JSON or comma-separated
+    WebsiteUrl = Column(String(255), nullable=True)
+    CompanySummary = Column(Text, nullable=True)
+    Industry = Column(String(255), nullable=True)
+    PrimaryGoals = Column(Text, nullable=True)
+    Notes = Column(Text, nullable=True)
+    LogoUrl = Column(String(1000), nullable=True)
+    PrimaryColor = Column(String(7), nullable=True)
+    SecondaryColor = Column(String(7), nullable=True)
+    DisplayNameShort = Column(String(100), nullable=True)
     CreatedAt = Column(DateTime, default=func.now())
     UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
     CreatedBy = Column(String(255))
@@ -61,7 +73,11 @@ class User(Base):
     FirstName = Column(String(100))
     LastName = Column(String(100))
     Email = Column(String(255), unique=True, nullable=False)
+    PasswordHash = Column(String(255), nullable=True)
     Role = Column(String(50))
+    Bio = Column(Text, nullable=True)
+    DecisionStyle = Column(String(100), nullable=True)
+    Status = Column(String(50), default='PENDING_APPROVAL')  # 'PENDING_APPROVAL', 'ACTIVE', 'INVITED', 'DEACTIVATED'
     CreatedAt = Column(DateTime, default=func.now())
     UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
     CreatedBy = Column(String(255))
@@ -77,9 +93,10 @@ class Goal(Base):
     Id = Column(Integer, primary_key=True, autoincrement=True)
     OrganizationId = Column(Integer, ForeignKey('organization.Id'), nullable=False)
     Title = Column(String(255), nullable=False)
+    ThreadId = Column(String(36), nullable=True) # Thread ID for conversation tracing
     DueDate = Column(DateTime, nullable=True) 
     InitiatedBy = Column(String(255))
-    GoalDescription = Column(String(255))
+    GoalDescription = Column(Text)
     CreatedAt = Column(DateTime, default=func.now())
     UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
     CreatedBy = Column(String(255))
@@ -93,6 +110,7 @@ class Assignment(Base):
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     GoalId = Column(Integer, ForeignKey('goal.Id'), nullable=False)
+    ThreadId = Column(String(36), nullable=True) # Thread ID for conversation tracing
     ParentAssignmentId = Column(Integer, ForeignKey('assignment.Id'), nullable=True)
     QuestionText = Column(String(255), nullable=False)
     Order = Column(Integer)
@@ -110,6 +128,7 @@ class UserResponse(Base):
     
     Id = Column(Integer, primary_key=True, autoincrement=True)
     AssignmentId = Column(Integer, ForeignKey('assignment.Id'), nullable=False)
+    ThreadId = Column(String(36), nullable=True) # Thread ID for conversation tracing
     AssignedTo = Column(String(255), nullable=False)
     Answer = Column(Text)
     Attachments = Column(Text, nullable=True)
@@ -250,3 +269,22 @@ class AuditLog(Base):
     Timestamp = Column(DateTime, default=func.now())
     
     organization = relationship("Organization")
+
+# Invitation Table
+class Invitation(Base):
+    __tablename__ = 'invitation'
+    
+    Id = Column(Integer, primary_key=True, autoincrement=True)
+    Email = Column(String(255), nullable=False)
+    Token = Column(String(255), unique=True, nullable=False, index=True)
+    FirstName = Column(String(100))
+    LastName = Column(String(100))
+    Role = Column(String(50))
+    GoalId = Column(Integer, ForeignKey('goal.Id'), nullable=False)
+    QuestionText = Column(Text, nullable=False)
+    ExpiresAt = Column(DateTime, nullable=False)
+    Used = Column(Boolean, default=False)
+    CreatedAt = Column(DateTime, default=func.now())
+    CreatedBy = Column(String(255))
+    
+    goal = relationship("Goal")

@@ -12,6 +12,18 @@ def create_client(client: schemas.ClientCreate, db: Session = Depends(get_db)):
         ContactEmail=client.ContactEmail,
         ContactPhone=client.ContactPhone,
         Address=client.Address,
+        Status=client.Status,
+        AutoApprove=client.AutoApprove,
+        AllowedDomains=client.AllowedDomains,
+        WebsiteUrl=client.WebsiteUrl,
+        CompanySummary=client.CompanySummary,
+        Industry=client.Industry,
+        PrimaryGoals=client.PrimaryGoals,
+        Notes=client.Notes,
+        LogoUrl=client.LogoUrl,
+        PrimaryColor=client.PrimaryColor,
+        SecondaryColor=client.SecondaryColor,
+        DisplayNameShort=client.DisplayNameShort,
         CreatedBy="system_user"
     )
     db.add(db_client)
@@ -41,6 +53,18 @@ def update_client(client_id: int, client: schemas.ClientUpdate, db: Session = De
     db_client.ContactEmail = client.ContactEmail
     db_client.ContactPhone = client.ContactPhone
     db_client.Address = client.Address
+    db_client.Status = client.Status
+    db_client.AutoApprove = client.AutoApprove
+    db_client.AllowedDomains = client.AllowedDomains
+    db_client.WebsiteUrl = client.WebsiteUrl
+    db_client.CompanySummary = client.CompanySummary
+    db_client.Industry = client.Industry
+    db_client.PrimaryGoals = client.PrimaryGoals
+    db_client.Notes = client.Notes
+    db_client.LogoUrl = client.LogoUrl
+    db_client.PrimaryColor = client.PrimaryColor
+    db_client.SecondaryColor = client.SecondaryColor
+    db_client.DisplayNameShort = client.DisplayNameShort
     db_client.UpdatedBy = "system_user"
     db.commit()
     db.refresh(db_client)

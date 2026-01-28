@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
 from db import models, schemas
+from sqlalchemy import func
 from api.dependencies.model_utils import get_db
 
 router = APIRouter()
@@ -12,12 +13,17 @@ router = APIRouter()
 # Create a new assignment
 @router.post("/assignments/", response_model=schemas.Assignment)
 def create_assignment(assignment: schemas.AssignmentCreate, db: Session = Depends(get_db)):
+    # Fetch ThreadId from Goal
+    goal = db.query(models.Goal).filter(models.Goal.Id == assignment.GoalId).first()
+    thread_id = goal.ThreadId if goal else None
+
     new_assignment = models.Assignment(
         GoalId=assignment.GoalId,
         ParentAssignmentId=assignment.ParentAssignmentId,
         QuestionText=assignment.QuestionText,
         Order=assignment.Order,
-        CreatedBy=assignment.CreatedBy
+        CreatedBy=assignment.CreatedBy,
+        ThreadId=thread_id
     )
     db.add(new_assignment)
     db.commit()
@@ -27,13 +33,24 @@ def create_assignment(assignment: schemas.AssignmentCreate, db: Session = Depend
 # Create a delegated assignment and assign it to a user
 @router.post("/delegate-assignment", response_model=schemas.Assignment)
 def create_delegated_assignment(assignment: schemas.DelegatedAssignmentCreate, db: Session = Depends(get_db)):
+    # Determine ThreadId (From Parent or Goal)
+    thread_id = None
+    if assignment.ParentAssignmentId:
+        parent = db.query(models.Assignment).filter(models.Assignment.Id == assignment.ParentAssignmentId).first()
+        thread_id = parent.ThreadId if parent else None
+    
+    if not thread_id and assignment.GoalId:
+         goal = db.query(models.Goal).filter(models.Goal.Id == assignment.GoalId).first()
+         thread_id = goal.ThreadId if goal else None
+
     # 1. Create the Assignment (Child)
     new_assignment = models.Assignment(
         GoalId=assignment.GoalId,
         ParentAssignmentId=assignment.ParentAssignmentId,
         QuestionText=assignment.QuestionText,
         Order=1, # Default order
-        CreatedBy=assignment.CreatedBy
+        CreatedBy=assignment.CreatedBy,
+        ThreadId=thread_id
     )
     db.add(new_assignment)
     db.commit()
@@ -44,7 +61,8 @@ def create_delegated_assignment(assignment: schemas.DelegatedAssignmentCreate, d
         AssignmentId=new_assignment.Id,
         AssignedTo=assignment.AssignedToEmail,
         Status='Assigned',
-        CreatedBy=assignment.CreatedBy
+        CreatedBy=assignment.CreatedBy,
+        ThreadId=thread_id
     )
     db.add(new_user_response)
     db.commit()
@@ -55,11 +73,15 @@ def create_delegated_assignment(assignment: schemas.DelegatedAssignmentCreate, d
 @router.post("/assignments/bulk-with-responses", response_model=schemas.AssignmentsFirstSave)
 def create_assignments_with_user_responses(assignments_payload: schemas.AssignmentsFirstSave, db: Session = Depends(get_db)):
     # Insert the Goal and get its ID
+    import uuid
+    new_thread_id = str(uuid.uuid4())
+
     new_goal = models.Goal(
         Title=assignments_payload.Goal,
         CreatedBy=assignments_payload.InitiatedBy,
         GoalDescription=assignments_payload.GoalDescription,
-        OrganizationId=assignments_payload.OrganizationId
+        OrganizationId=assignments_payload.OrganizationId,
+        ThreadId=new_thread_id
     )
     db.add(new_goal)
     db.commit()
@@ -75,7 +97,8 @@ def create_assignments_with_user_responses(assignments_payload: schemas.Assignme
             ParentAssignmentId=assignment.ParentAssignmentId,
             QuestionText=assignment.QuestionText,
             Order=assignment.Order,
-            CreatedBy=assignment.CreatedBy
+            CreatedBy=assignment.CreatedBy,
+            ThreadId=new_thread_id
         )
         db.add(new_assignment)
         db.commit()  # Commit the assignment to get the AssignmentId
@@ -89,7 +112,8 @@ def create_assignments_with_user_responses(assignments_payload: schemas.Assignme
                 AssignmentId=new_assignment.Id,
                 AssignedTo=user_email,
                 Status='Assigned',  # Default to 'Assigned'
-                CreatedBy=assignment.CreatedBy
+                CreatedBy=assignment.CreatedBy,
+                ThreadId=new_thread_id
             )
             db.add(new_user_response)
             assigned_users.append(user_email)  # Collect the user email for the response
@@ -98,6 +122,7 @@ def create_assignments_with_user_responses(assignments_payload: schemas.Assignme
             "assignment": new_assignment,
             "assigned_users": assigned_users  # Add assigned users to each assignment
         })
+
 
     db.commit()  # Commit all the records at once for both Assignment and UserResponse
 
@@ -245,7 +270,7 @@ def get_my_tasks(user_email: str, db: Session = Depends(get_db)):
     results = (
         db.query(models.Assignment, models.UserResponse.Status, models.UserResponse.Answer)
         .join(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
-        .filter(models.UserResponse.AssignedTo == user_email)
+        .filter(func.lower(models.UserResponse.AssignedTo) == user_email.lower())
         .all()
     )
     
@@ -286,6 +311,7 @@ def get_my_tasks(user_email: str, db: Session = Depends(get_db)):
             UpdatedAt=assignment.UpdatedAt,
             CreatedBy=assignment.CreatedBy,
             UpdatedBy=assignment.UpdatedBy,
+            ThreadId=assignment.ThreadId,
             Status=status,
             Answer=answer,
             DelegatedUsers=delegated_users
