@@ -342,3 +342,48 @@ async def extract_team(file: UploadFile = File(...), db: Session = Depends(get_d
             {"FirstName": "Alvin", "LastName": "George", "Email": "alvin.george@example.com", "Role": "Operations Specialist", "OrganizationId": org_id, "DepartmentId": dept_id},
             {"FirstName": "George", "LastName": "Joy", "Email": "george.joy@example.com", "Role": "Research Analyst", "OrganizationId": org_id, "DepartmentId": dept_id}
         ]}
+
+class EnhanceRequest(BaseModel):
+    text: str
+    context: str = None
+
+@router.post("/enhance")
+async def enhance_text(request: EnhanceRequest):
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OpenAI API Key missing")
+        
+    system_message = (
+        "You are a professional business editor. Rewrite the user's text to be more "
+        "strategic, concise, and professional. Improve clarity and tone suitable for executive communication. "
+        "Do not change the underlying meaning. Return ONLY the enhanced text."
+    )
+    
+    user_content = request.text
+    if request.context:
+         user_content = f"Context: {request.context}\n\nText to Enhance: {request.text}"
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+
+    payload = {
+        "model": "gpt-3.5-turbo",
+        "messages": [
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_content}
+        ],
+        "max_tokens": 500,
+        "temperature": 0.7
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30.0)
+            response.raise_for_status()
+            result = response.json()
+            enhanced_text = result["choices"][0]["message"]["content"]
+            return {"text": enhanced_text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
