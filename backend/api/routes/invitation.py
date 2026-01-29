@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from datetime import datetime, timedelta
 import uuid
 import os
@@ -173,49 +174,63 @@ def submit_invitation_answer(token: str, answer_data: AnswerRequest, db: Session
     if not parent_assignment:
         raise HTTPException(status_code=404, detail="Original assignment context not found")
 
-    # Check if a child assignment (delegation) already exists for this user
-    # We look for an assignment that is a child of parent_assignment 
-    # AND has a UserResponse for this email
-    existing_delegation = (
-        db.query(models.Assignment)
-        .join(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
-        .filter(models.Assignment.ParentAssignmentId == parent_assignment.Id)
-        .filter(models.UserResponse.AssignedTo == invitation.Email)
+    # 1. Check if user is directly assigned to the parent assignment (Root/Original)
+    # Use case-insensitive matching for robustness
+    direct_response = (
+        db.query(models.UserResponse)
+        .filter(models.UserResponse.AssignmentId == parent_assignment.Id)
+        .filter(func.lower(models.UserResponse.AssignedTo) == invitation.Email.lower())
         .first()
     )
 
-    if existing_delegation:
-        # Update existing response
-        user_response = db.query(models.UserResponse).filter(models.UserResponse.AssignmentId == existing_delegation.Id).first()
-        if user_response:
-            user_response.Answer = answer_data.Answer
-            user_response.Status = 'Completed'
-            user_response.UpdatedBy = invitation.Email
-            user_response.UpdatedAt = datetime.utcnow()
+    if direct_response:
+        # Update the direct response
+        direct_response.Answer = answer_data.Answer
+        direct_response.Status = 'Completed'
+        direct_response.UpdatedBy = invitation.Email
+        direct_response.UpdatedAt = datetime.utcnow()
     else:
-        # Create NEW Child Assignment (Delegation)
-        new_assignment = models.Assignment(
-            GoalId=invitation.GoalId,
-            ParentAssignmentId=parent_assignment.Id,
-            QuestionText=invitation.QuestionText,
-            Order=1,
-            CreatedBy=invitation.CreatedBy, # The Inviter created the delegation context
-            ThreadId=parent_assignment.ThreadId
+        # 2. Check if a child assignment (delegation) already exists for this user
+        existing_delegation = (
+            db.query(models.Assignment)
+            .join(models.UserResponse, models.Assignment.Id == models.UserResponse.AssignmentId)
+            .filter(models.Assignment.ParentAssignmentId == parent_assignment.Id)
+            .filter(func.lower(models.UserResponse.AssignedTo) == invitation.Email.lower())
+            .first()
         )
-        db.add(new_assignment)
-        db.commit()
-        db.refresh(new_assignment)
 
-        # Create UserResponse
-        new_user_response = models.UserResponse(
-            AssignmentId=new_assignment.Id,
-            AssignedTo=invitation.Email,
-            Status='Completed',
-            Answer=answer_data.Answer,
-            CreatedBy=invitation.Email, # The Invitee created the response
-            ThreadId=parent_assignment.ThreadId
-        )
-        db.add(new_user_response)
+        if existing_delegation:
+            # Update existing response
+            user_response = db.query(models.UserResponse).filter(models.UserResponse.AssignmentId == existing_delegation.Id).first()
+            if user_response:
+                user_response.Answer = answer_data.Answer
+                user_response.Status = 'Completed'
+                user_response.UpdatedBy = invitation.Email
+                user_response.UpdatedAt = datetime.utcnow()
+        else:
+            # Create NEW Child Assignment (Delegation)
+            new_assignment = models.Assignment(
+                GoalId=invitation.GoalId,
+                ParentAssignmentId=parent_assignment.Id,
+                QuestionText=invitation.QuestionText,
+                Order=1,
+                CreatedBy=invitation.CreatedBy, # The Inviter created the delegation context
+                ThreadId=parent_assignment.ThreadId
+            )
+            db.add(new_assignment)
+            db.commit()
+            db.refresh(new_assignment)
+
+            # Create UserResponse
+            new_user_response = models.UserResponse(
+                AssignmentId=new_assignment.Id,
+                AssignedTo=invitation.Email,
+                Status='Completed',
+                Answer=answer_data.Answer,
+                CreatedBy=invitation.Email, # The Invitee created the response
+                ThreadId=parent_assignment.ThreadId
+            )
+            db.add(new_user_response)
         
     invitation.Used = True
     db.commit()

@@ -523,20 +523,20 @@ class DelegatedAssignmentCreate(BaseModel):
 # Invitation Schema
 class InvitationBase(BaseModel):
     Email: EmailStr
-    Token: str
     FirstName: Optional[str] = None
     LastName: Optional[str] = None
     Role: Optional[str] = None
     GoalId: int
     QuestionText: str
-    ExpiresAt: datetime
-    Used: bool = False
 
 class InvitationCreate(InvitationBase):
     CreatedBy: str
 
 class Invitation(InvitationBase):
     Id: int
+    Token: str
+    ExpiresAt: datetime
+    Used: bool
     CreatedAt: datetime
     CreatedBy: str
     
