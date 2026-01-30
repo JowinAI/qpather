@@ -38,6 +38,9 @@ class SetPasswordRequest(BaseModel):
     token: str
     password: str
 
+class DevLoginRequest(BaseModel):
+    email: EmailStr
+
 @router.post("/auth/register")
 async def register(request: RegisterRequest, db: Session = Depends(get_db)):
     # 1. Check if user exists
@@ -294,3 +297,58 @@ async def activate_account(request: SetPasswordRequest, db: Session = Depends(ge
     db.commit()
 
     return {"message": "Password set successfully. You can now login."}
+
+@router.post("/auth/dev-login")
+async def dev_login(request: DevLoginRequest, db: Session = Depends(get_db)):
+    # For Internal/Dev use only: Login without password checks
+    db_user = db.query(models.User).filter(models.User.Email == request.email).first()
+    
+    # Auto-Provisioning for Dev Environment
+    if not db_user:
+        # Find default organization or create one
+        org = db.query(models.Organization).first()
+        if not org:
+            # Create minimal structure if DB is empty
+            client = models.Client(Name="Default Client", CreatedBy="system")
+            db.add(client)
+            db.flush()
+            org = models.Organization(ClientId=client.Id, Name="Default Organization", CreatedBy="system")
+            db.add(org)
+            db.flush()
+            
+        # Create new active user
+        first_name = request.email.split('@')[0]
+        db_user = models.User(
+            OrganizationId=org.Id,
+            FirstName=first_name.capitalize(),
+            LastName="User",
+            Email=request.email,
+            Role="Contributor",
+            Status="ACTIVE",
+            CreatedBy="dev_login",
+            Bio="Auto-created via Dev Login"
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+
+    # Generate Token
+    access_token_expires = timedelta(minutes=60)
+    expire = datetime.utcnow() + access_token_expires
+    to_encode = {"sub": db_user.Email, "exp": expire}
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+    return {
+        "access_token": encoded_jwt,
+        "token_type": "bearer",
+        "user": {
+            "id": db_user.Id,
+            "email": db_user.Email,
+            "firstName": db_user.FirstName,
+            "lastName": db_user.LastName,
+            "role": db_user.Role,
+            "status": db_user.Status,
+            "organizationId": db_user.OrganizationId,
+            "departmentId": db_user.DepartmentId
+        }
+    }

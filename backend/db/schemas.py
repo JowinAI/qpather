@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, condecimal
-from typing import Optional, List
+from typing import Optional, List, Union
 from datetime import datetime
 
 # Client Schema
@@ -100,6 +100,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     CreatedBy: str
+    Password: Optional[str] = None
 
 class UserUpdate(UserBase):
     UpdatedBy: Optional[str] = None
@@ -427,7 +428,7 @@ class AuditLog(AuditLogBase):
 
 # Schema for user details used in assignments
 class AssignmentUser(BaseModel):
-    id: str | int  # Allow string IDs for new/temp users
+    id: Union[str, int]  # Allow string IDs for new/temp users
     name: str
     email: EmailStr
 
@@ -542,3 +543,112 @@ class Invitation(InvitationBase):
     
     class Config:
         from_attributes = True
+
+# Dashboard Settings Schemas
+class DashboardSections(BaseModel):
+    executiveSummary: bool = True
+    signalHealth: bool = True
+    topRisks: bool = True
+    conflicts: bool = True
+    patterns: bool = True
+    actions: bool = True
+    dataGaps: bool = True
+    evidence: bool = False
+    focusQna: bool = True
+
+class DashboardDisplay(BaseModel):
+    timeHorizon: str = "next_2_3_quarters"
+    verbosity: str = "concise"
+    maxRisks: int = 5
+    maxActions: int = 5
+
+class FocusQuestionRules(BaseModel):
+    maxQuestions: int = 5
+    maxChars: int = 120
+    answerStyle: str = "2-3 bullets"
+    mustReferenceSources: bool = True
+
+class DashboardSettingsPayload(BaseModel):
+    lensName: str
+    focusSignals: List[str]
+    focusQuestions: List[str]
+    sections: DashboardSections
+    display: DashboardDisplay
+    focusQuestionRules: Optional[FocusQuestionRules] = None
+
+class DashboardSettings(BaseModel):
+    Id: int
+    UserId: int
+    GoalId: Optional[int]
+    Settings: str # JSON String
+    
+    class Config:
+        from_attributes = True
+
+# Goal Dashboard Insight Schema
+class GoalDashboardInsight(BaseModel):
+    Id: int
+    GoalId: int
+    UserId: Optional[int]
+    LensSignature: Optional[str]
+    InsightJson: str
+    ModelUsed: Optional[str]
+    PromptVersion: Optional[str]
+    CreatedAt: datetime
+    UpdatedAt: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+# Analysis Request Models
+class ViewerContext(BaseModel):
+    name: str
+    email: str
+    role: str
+
+class GoalContext(BaseModel):
+    goal_id: str
+    goal_title: str
+    goal_text: str
+    as_of_date: str
+
+class HierarchyNode(BaseModel):
+    node_id: str
+    level: int
+    parent_id: Optional[str] = None
+    signal: Optional[dict] = None # {name: str, type: str}
+    assigned_to: Optional[dict] = None # {name, email, role}
+    question: str
+    responses: List[dict] # [{response_id, from, text, confidence}]
+
+class HierarchyData(BaseModel):
+    nodes: List[HierarchyNode]
+
+class AnalysisRules(BaseModel):
+    signal_weighting: dict
+    status_thresholds: dict
+
+class AnalysisRequest(BaseModel):
+    viewer_context: ViewerContext
+    goal_context: GoalContext
+    dashboard_request: DashboardSettingsPayload # Reuse existing
+    hierarchy: HierarchyData
+    rules: Optional[AnalysisRules] = None
+
+# Chat Request Models
+class ChatRequest(BaseModel):
+    viewer_context: ViewerContext
+    goal_context: GoalContext
+    dashboard_request: DashboardSettingsPayload
+    hierarchy: HierarchyData
+    insight_snapshot: dict # JSON of the analysis
+    user_question: str
+
+
+
+class EnhanceRequest(BaseModel):
+    text: str
+
+
+class BreakdownRequest(BaseModel):
+    content: str

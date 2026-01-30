@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db import models, schemas
 from api.dependencies.model_utils import get_db
+import bcrypt
 
 router = APIRouter()
 
@@ -12,6 +13,12 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    password_hash = None
+    user_status = 'PENDING_APPROVAL'
+    if user.Password:
+        password_hash = bcrypt.hashpw(user.Password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        user_status = 'ACTIVE'
+
     new_user = models.User(
         OrganizationId=user.OrganizationId,
         DepartmentId=user.DepartmentId,
@@ -19,7 +26,11 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         LastName=user.LastName,
         Email=user.Email,
         Role=user.Role,
-        CreatedBy=user.CreatedBy
+        Bio=user.Bio,
+        DecisionStyle=user.DecisionStyle,
+        CreatedBy=user.CreatedBy,
+        PasswordHash=password_hash,
+        Status=user_status
     )
     db.add(new_user)
     db.commit()
@@ -62,6 +73,8 @@ def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(ge
     db_user.LastName = user.LastName
     db_user.Email = user.Email
     db_user.Role = user.Role
+    db_user.Bio = user.Bio
+    db_user.DecisionStyle = user.DecisionStyle
     db_user.UpdatedBy = user.UpdatedBy
     db.commit()
     db.refresh(db_user)

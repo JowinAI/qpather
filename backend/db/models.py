@@ -288,3 +288,35 @@ class Invitation(Base):
     CreatedBy = Column(String(255))
     
     goal = relationship("Goal")
+
+# DashboardSettings Table
+class DashboardSettings(Base):
+    __tablename__ = 'dashboardsettings'
+    
+    Id = Column(Integer, primary_key=True, autoincrement=True)
+    UserId = Column(Integer, ForeignKey('user.Id'), nullable=False)
+    GoalId = Column(Integer, ForeignKey('goal.Id'), nullable=True) # Null for User Default
+    Settings = Column(Text, nullable=False) # JSON blob containing lens, signals, etc.
+    CreatedAt = Column(DateTime, default=func.now())
+    UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    user = relationship("User")
+    goal = relationship("Goal")
+
+# GoalDashboardInsight Table (Stores AI Analysis Results)
+class GoalDashboardInsight(Base):
+    __tablename__ = 'goaldashboardinsight'
+    
+    Id = Column(Integer, primary_key=True, autoincrement=True)
+    GoalId = Column(Integer, ForeignKey('goal.Id'), nullable=False)
+    UserId = Column(Integer, ForeignKey('user.Id'), nullable=True) # Optional: who triggered it
+    LensSignature = Column(String(255), nullable=True) # Hash/Key to identify unique settings combo
+    InsightJson = Column(Text, nullable=False) # The full AI JSON response
+    ModelUsed = Column(String(50))
+    PromptVersion = Column(String(50))
+    CreatedAt = Column(DateTime, default=func.now())
+    UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    goal = relationship("Goal")
+    user = relationship("User")
+
