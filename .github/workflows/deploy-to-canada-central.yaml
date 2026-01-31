@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - 'backend/**' 
+      - 'backend/**'
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: dooe-backend-api # Your Azure Web App name
-  AZURE_WEBAPP_PACKAGE_PATH: 'backend' # Path to your backend project
-  PYTHON_VERSION: '3.12' # Python version
+  AZURE_WEBAPP_NAME: dooe-backend-api
+  AZURE_WEBAPP_PACKAGE_PATH: 'backend'
+  PYTHON_VERSION: '3.12'
 
 jobs:
   build:
@@ -30,12 +30,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/requirements.txt
 
+      - name: Package backend for deployment
+        run: |
+          # Create a zip that contains the contents of the backend directory at the zip root
+          cd ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          zip -r ../backend.zip .
+          cd ..
+          echo "Created backend.zip:"
+          ls -la backend.zip
+          echo "Previewing backend.zip contents:"
+          unzip -l backend.zip
+
       - name: Upload backend artifact for deployment
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: |
-            ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/
+          path: backend.zip
           if-no-files-found: error
 
   deploy:
@@ -51,10 +61,24 @@ jobs:
         with:
           name: python-app
           path: .
+
+      - name: Verify artifact content before deployment
+        run: |
+          echo "Workspace root:"
+          ls -la
+          if [ ! -f backend.zip ]; then
+            echo "backend.zip not found - failing early"
+            exit 1
+          fi
+          echo "backend.zip contents:"
+          unzip -l backend.zip
+          echo "Extract a sample to inspect file layout:"
+          mkdir -p extracted && unzip backend.zip -d extracted && ls -la extracted
+
       - name: Deploy to Azure Web App using publish profile
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1FC9083F2581408792A95B19E1945B49 }} # Test Ensure this secret is set in GitHub Secrets
-          package: . 
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1FC9083F2581408792A95B19E1945B49 }}
+          package: backend.zip
