@@ -76,7 +76,7 @@ def run_check():
     user_email = user_res.json()["Email"]
     user_name = "Test User"
 
-    # 5. Create Goal
+    # 5. Create Goal Test
     # Construct payload matching GoalWithAssignments schema Test
     user_obj = {"id": user_id, "name": user_name, "email": user_email}
     
