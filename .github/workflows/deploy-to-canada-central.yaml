@@ -1,4 +1,4 @@
-name: Build and deploy Python app to Azure Web App - dooe-backend-api
+name: Deploy to Canadad API - dooe-backend-api
 
 on:
   push:
