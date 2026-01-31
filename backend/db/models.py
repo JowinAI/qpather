@@ -317,6 +317,22 @@ class GoalDashboardInsight(Base):
     CreatedAt = Column(DateTime, default=func.now())
     UpdatedAt = Column(DateTime, default=func.now(), onupdate=func.now())
     
+
     goal = relationship("Goal")
     user = relationship("User")
+
+# RawContextInput Table (Side channel for unstructured input)
+class RawContextInput(Base):
+    __tablename__ = 'rawcontextinput'
+    
+    Id = Column(Integer, primary_key=True, autoincrement=True)
+    GoalId = Column(Integer, ForeignKey('goal.Id'), nullable=False)
+    UserId = Column(Integer, ForeignKey('user.Id'), nullable=False)
+    Content = Column(Text, nullable=False)
+    Attachments = Column(Text, nullable=True) # JSON list of URLs in future
+    CreatedAt = Column(DateTime, default=func.now())
+    
+    goal = relationship("Goal")
+    user = relationship("User")
+
 

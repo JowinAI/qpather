@@ -159,17 +159,30 @@ async def analyze_dashboard(
         "email": current_user.Email if current_user else "exec@company.com",
         "role": current_user.Role if current_user else "Executive"
     }
+
+    # Fetch Unstructured Context (Raw Inputs)
+    raw_inputs = db.query(models.RawContextInput).filter(models.RawContextInput.GoalId == goal_id).all()
+    unstructured_context_list = [{
+        "content": r.Content, 
+        "created_at": r.CreatedAt.strftime("%Y-%m-%d %H:%M") if r.CreatedAt else "",
+        "user_id": r.UserId
+    } for r in raw_inputs]
     
     # 4. Construct Payload for OpenAI
-    # We construct the "AnalysisRequest" JSON structure described in prompt
-    
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
          raise HTTPException(status_code=500, detail="OPENAI_API_KEY is missing in environment variables. Real analysis requires a valid API key.")
 
     system_message = (
         "You are DOOE AI, an executive decision-intelligence engine. "
-        "Produce an executive dashboard analysis. "
+        "Produce an executive dashboard analysis based on two input streams: "
+        "1. 'hierarchy' (Structured Questions & Responses) - PRIMARY SOURCE. "
+        "2. 'unstructured_context' (Raw Inputs) - SECONDARY CONTEXT. "
+        "RULES: "
+        "- Prioritize structured responses for status determination. "
+        "- Use raw inputs to add nuance, explain 'why', or detect weak signals. "
+        "- If raw input contradicts structured data, flag this in 'conflicts'. "
+        "- Explicitly mention 'unstructured input' or 'raw context' when using it to support a claim. "
         "Output MUST be valid JSON with the following keys: "
         "executive_summary (string), overall_status (Green/Yellow/Red), "
         "aggregate_confidence (0.0-1.0), as_of_date (YYYY-MM-DD), "
@@ -193,6 +206,7 @@ async def analyze_dashboard(
         },
         "dashboard_request": settings.model_dump(),
         "hierarchy": hierarchy.model_dump(),
+        "unstructured_context": unstructured_context_list,
         "rules": {
             "signal_weighting": { "leading": 1.4, "execution": 1.3, "constraint": 1.2, "market": 1.1, "lagging": 1.0 },
             "status_thresholds": { "green": 0.75, "yellow": 0.60, "red": 0.00 }
