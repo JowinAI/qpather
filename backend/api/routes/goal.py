@@ -534,7 +534,10 @@ def get_strategy_readiness(goal_id: int, db: Session = Depends(get_db)):
         
     response_count = len(responses)
     
-    # 2. Role Coverage (Unique users responded vs assigned)
+    # 2. Raw Inputs Check
+    raw_input_count = db.query(models.RawContextInput).filter(models.RawContextInput.GoalId == goal_id).count()
+
+    # 3. Role Coverage (Unique users responded vs assigned)
     assigned_users = set()
     responded_users = set()
     
@@ -549,18 +552,17 @@ def get_strategy_readiness(goal_id: int, db: Session = Depends(get_db)):
     if len(assigned_users) > 0:
         role_coverage_pct = int((len(responded_users) / len(assigned_users)) * 100)
 
-    # 3. Minimum thresholds
-    # Rule: At least 3 responses OR 50% of assignments covered, whichever is smaller (but > 0)
-    # Adjust this logic based on "Strategy Readiness Gate" requirement. 
-    # The requirement mentions "Minimum number of structured responses received".
-    min_responses = 1 # Minimal for testing, ideally maybe 3
+    # 4. Readiness Logic
+    # Ready if at least 1 structured response exist OR raw inputs exist
+    min_responses = 1 
     
-    is_ready = response_count >= min_responses
+    is_ready = (response_count >= min_responses) or (raw_input_count > 0)
     
     return {
         "isStrategyReady": is_ready,
         "metrics": {
             "structuredResponses": response_count,
+            "rawInputs": raw_input_count,
             "totalAssignments": total_assignments,
             "rolesCoveredPct": role_coverage_pct,
             "respondedUsers": len(responded_users),
