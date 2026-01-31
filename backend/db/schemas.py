@@ -652,3 +652,23 @@ class EnhanceRequest(BaseModel):
 
 class BreakdownRequest(BaseModel):
     content: str
+
+
+# RawContextInput Schema
+class RawContextInputBase(BaseModel):
+    GoalId: int
+    Content: str
+    Attachments: Optional[str] = None
+
+class RawContextInputCreate(RawContextInputBase):
+    UserEmail: str
+
+class RawContextInput(RawContextInputBase):
+    Id: int
+    UserId: int
+    CreatedAt: datetime
+    
+    class Config:
+        from_attributes = True
+
+

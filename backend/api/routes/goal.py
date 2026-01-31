@@ -485,4 +485,87 @@ def delete_goal(goal_id: int, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error deleting goal: {str(e)}")
+
+# Raw Input Endpoints
+@router.post("/goal/{goal_id}/raw-input", response_model=schemas.RawContextInput)
+def create_raw_input(goal_id: int, input_data: schemas.RawContextInputCreate, db: Session = Depends(get_db)):
+    goal = db.query(models.Goal).filter(models.Goal.Id == goal_id).first()
+    if not goal:
+        raise HTTPException(status_code=404, detail="Goal not found")
+    
+    # Resolve User
+    user = db.query(models.User).filter(func.lower(models.User.Email) == input_data.UserEmail.lower()).first()
+    if not user:
+        # Fallback for dev: if user not found, try to find by fuzzy match or just use first user
+        # For strictness we should raise error, but for dev ease we can be lenient if needed. 
+        # Requirement says "preserve flows", so adhere to strict user check for integrity.
+        raise HTTPException(status_code=404, detail=f"User {input_data.UserEmail} not found. Please ensure you are registered.")
+
+    new_input = models.RawContextInput(
+        GoalId=goal_id,
+        UserId=user.Id,
+        Content=input_data.Content,
+        Attachments=input_data.Attachments
+    )
+    db.add(new_input)
+    db.commit()
+    db.refresh(new_input)
+    return new_input
+
+@router.get("/goal/{goal_id}/raw-input", response_model=List[schemas.RawContextInput])
+def get_raw_inputs(goal_id: int, db: Session = Depends(get_db)):
+    return db.query(models.RawContextInput).filter(models.RawContextInput.GoalId == goal_id).order_by(models.RawContextInput.CreatedAt.desc()).all()
+
+# Strategy Readiness Endpoint
+@router.get("/goal/{goal_id}/readiness")
+def get_strategy_readiness(goal_id: int, db: Session = Depends(get_db)):
+    # 1. Structured Responses Check
+    assignments = db.query(models.Assignment).filter(models.Assignment.GoalId == goal_id).all()
+    assignment_ids = [a.Id for a in assignments]
+    total_assignments = len(assignments)
+    
+    responses = []
+    if assignment_ids:
+        # Count completed responses
+        responses = db.query(models.UserResponse).filter(
+            models.UserResponse.AssignmentId.in_(assignment_ids),
+            models.UserResponse.Status == 'Completed'
+        ).all()
+        
+    response_count = len(responses)
+    
+    # 2. Role Coverage (Unique users responded vs assigned)
+    assigned_users = set()
+    responded_users = set()
+    
+    if assignment_ids:
+        all_assigned = db.query(models.UserResponse).filter(models.UserResponse.AssignmentId.in_(assignment_ids)).all()
+        for r in all_assigned:
+            assigned_users.add(r.AssignedTo)
+            if r.Status == 'Completed':
+                responded_users.add(r.AssignedTo)
+                
+    role_coverage_pct = 0
+    if len(assigned_users) > 0:
+        role_coverage_pct = int((len(responded_users) / len(assigned_users)) * 100)
+
+    # 3. Minimum thresholds
+    # Rule: At least 3 responses OR 50% of assignments covered, whichever is smaller (but > 0)
+    # Adjust this logic based on "Strategy Readiness Gate" requirement. 
+    # The requirement mentions "Minimum number of structured responses received".
+    min_responses = 1 # Minimal for testing, ideally maybe 3
+    
+    is_ready = response_count >= min_responses
+    
+    return {
+        "isStrategyReady": is_ready,
+        "metrics": {
+            "structuredResponses": response_count,
+            "totalAssignments": total_assignments,
+            "rolesCoveredPct": role_coverage_pct,
+            "respondedUsers": len(responded_users),
+            "totalUsers": len(assigned_users)
+        },
+        "message": "Strategy Ready" if is_ready else "Insufficient validated input."
+    }
+

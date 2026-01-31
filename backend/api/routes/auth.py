@@ -298,10 +298,15 @@ async def activate_account(request: SetPasswordRequest, db: Session = Depends(ge
 
     return {"message": "Password set successfully. You can now login."}
 
+from sqlalchemy import func
+
 @router.post("/auth/dev-login")
 async def dev_login(request: DevLoginRequest, db: Session = Depends(get_db)):
+    # Normalize email
+    email = request.email.lower()
+    
     # For Internal/Dev use only: Login without password checks
-    db_user = db.query(models.User).filter(models.User.Email == request.email).first()
+    db_user = db.query(models.User).filter(func.lower(models.User.Email) == email).first()
     
     # Auto-Provisioning for Dev Environment
     if not db_user:
@@ -317,12 +322,12 @@ async def dev_login(request: DevLoginRequest, db: Session = Depends(get_db)):
             db.flush()
             
         # Create new active user
-        first_name = request.email.split('@')[0]
+        first_name = email.split('@')[0]
         db_user = models.User(
             OrganizationId=org.Id,
             FirstName=first_name.capitalize(),
             LastName="User",
-            Email=request.email,
+            Email=email,
             Role="Contributor",
             Status="ACTIVE",
             CreatedBy="dev_login",
